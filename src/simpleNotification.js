@@ -47,14 +47,6 @@ class SimpleNotification {
         notification.addEventListener("click", () => {
             SimpleNotification.destroy(notification, 0);
         });
-        // Start the notification timer when the slidein is over
-        /*if (options.sticky == undefined || options.sticky == false) {
-            notification.addEventListener("animationend", event => {
-                if (event.animationName == "slidein-right" || event.animationName == "slidein-left") {
-                    SimpleNotification.start(event.target, options.duration, options.fadeout);
-                }
-            });
-        }*/
         // Pause on hover if not sticky
         if (!options.sticky) {
             notification.addEventListener("mouseenter", event => {
@@ -139,28 +131,6 @@ class SimpleNotification {
             }
         });
     }
-
-    /**
-     * Start the timer of the notification
-     * @param {object} notification The notification that will be started
-     * @param {integer} duration The lifespan of the notification in ms
-     * @param {integer} fadeout The duration of the fadeout in ms
-     */
-    /*start(notification, duration, fadeout) {
-        // Add progress bar if not sticky
-        let notificationLife = document.createElement("span");
-        notificationLife.className = "gn-lifespan";
-        // Set the time before removing the notification
-        notificationLife.style.animationDuration = duration + "ms";
-        notificationLife.classList.add("gn-extinguish");
-        // Destroy the notification when the animation end
-        notificationLife.addEventListener("animationend", event => {
-            if (event.animationName == "shorten") {
-                this.destroy(notification, fadeout);
-            }
-        });
-        notification.appendChild(notificationLife);
-    }*/
 
     /**
      * Create a notification with the "success" style

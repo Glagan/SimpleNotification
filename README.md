@@ -2,6 +2,8 @@
 
 *SimpleNotification* is a library to display simple yet customizable notifications.
 
+You can find a live demo here: [https://notification.nikurasu.org/](https://notification.nikurasu.org/)
+
 ## Installation
 
 You simply need to include ``simpleNotification.css`` (or it's minified version), ``simpleNotification.js`` and you're ready to go !

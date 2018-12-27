@@ -7,24 +7,6 @@
     }
 }
 
-@keyframes slidein-right {
-    from {
-        transform: translateX(100%);
-    }
-    to {
-        transform: translateX(0);
-    }
-}
-
-@keyframes slidein-left {
-    from {
-        transform: translateX(-100%);
-    }
-    to {
-        transform: translateX(0);
-    }
-}
-
 @keyframes shorten {
     from {
         width: 100%;
@@ -86,16 +68,6 @@
     min-width: 20rem;
     max-width: 30rem;
 }
-
-/*.gn-top-right .gn-notification,
-.gn-bottom-right .gn-notification {
-    animation-name: slidein-right;
-}
-
-.gn-top-left .gn-notification,
-.gn-bottom-left .gn-notification {
-    animation-name: slidein-left;
-}*/
 
 .gn-notification h1 {
     background-color: rgba(0, 0, 0, 0.2);
