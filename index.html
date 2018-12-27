@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Glagan/SimpleNotification</title>
+    <link rel="stylesheet" type="text/css" media="screen" href="src/simpleNotification.css" />
+    <style>
+        body {
+            background-color: rgba(70, 137, 61, 1);
+            margin: 0;
+            padding: 0;
+        }
+
+        #filter {
+            z-index: -1;
+            position: fixed;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            right: 0;
+            box-shadow: inset 0px 0px 300px 50px rgba(0, 0, 0, 0.75);
+        }
+
+        main {
+            width: 60%;
+            margin: 0.5rem auto;
+            background-color: rgb(53, 64, 79, 0.6);
+            border: 1px solid rgb(53, 64, 79, 0.6);
+            box-shadow: 0 0 5px rgb(53, 64, 79, 0.6);
+            border-radius: 4px;
+            padding: 1rem;
+            color: white;
+        }
+
+        main h1,
+        main h2 {
+            margin-top: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .columns-container {
+            width: 100%;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            border: 1px solid black;
+            border-radius: 4px;
+            background-color: rgba(158, 158, 158, 0.4);
+        }
+
+        .columns-container > div {
+            max-width: 50%;
+            flex: 0 0 50%;
+        }
+
+        .bottom-row {
+            margin-top: 50px;
+        }
+
+        .text-right {
+            text-align: right;
+        }
+
+        .btn {
+            border: 0;
+            padding: 0.4rem;
+            margin: 0.2rem;
+            border-radius: 4px;
+        }
+
+        .btn-success {
+            background-color: #689f38;
+            box-shadow: 1px 1px 3px #689f38;
+            color: white;
+        }
+
+        .btn-info {
+            background-color: #0288d1;
+            box-shadow: 1px 1px 3px #0288d1;
+            color: white;
+        }
+
+        .btn-error {
+            background-color: #e53935;
+            box-shadow: 1px 1px 3px #e53935;
+            color: white;
+        }
+
+        .btn-warning {
+            background-color: #ff8f00;
+            box-shadow: 1px 1px 3px #ff8f00;
+            color: white;
+        }
+
+        .btn-message {
+            background-color: #333333;
+            box-shadow: 1px 1px 3px #333333;
+            color: white;
+        }
+
+        .btn-submit {
+            background-color: #004d40;
+            box-shadow: 1px 1px 3px #004d40;
+            color: white;
+        }
+
+        #custom {
+            display: flex;
+            flex-wrap: wrap;
+        }
+
+        #custom > .group {
+            width: 100%;
+            margin-bottom: 1rem;
+        }
+
+        .group > label {
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+
+        .group > input,
+        .group select,
+        .group textarea {
+            width: calc(100% - 0.25rem);
+            padding: 0.25rem;
+        }
+    </style>
+</head>
+<body>
+    <div id="filter"></div>
+    <main>
+        <h1>Glagan/SimpleNotification</h1>
+        <h2><a href="">Github</a></h2>
+        <p>Click buttons to create notifications.</p>
+        <div class="columns-container">
+            <div class="">
+                <button data-position="top-left" data-type="success" class="btn btn-success">Success</button>
+                <button data-position="top-left" data-type="info" class="btn btn-info">Info</button>
+                <button data-position="top-left" data-type="error" class="btn btn-error">Error</button><br>
+                <button data-position="top-left" data-type="warning" class="btn btn-warning">Warning</button>
+                <button data-position="top-left" data-type="message" class="btn btn-message">Message</button>
+            </div>
+            <div class="text-right">
+                <button data-position="top-right" data-type="success" class="btn btn-success">Success</button>
+                <button data-position="top-right" data-type="info" class="btn btn-info">Info</button>
+                <button data-position="top-right" data-type="error" class="btn btn-error">Error</button><br>
+                <button data-position="top-right" data-type="warning" class="btn btn-warning">Warning</button>
+                <button data-position="top-right" data-type="message" class="btn btn-message">Message</button>
+            </div>
+            <div class="bottom-row">
+                <button data-position="bottom-left" data-type="success" class="btn btn-success">Success</button>
+                <button data-position="bottom-left" data-type="info" class="btn btn-info">Info</button>
+                <button data-position="bottom-left" data-type="error" class="btn btn-error">Error</button><br>
+                <button data-position="bottom-left" data-type="warning" class="btn btn-warning">Warning</button>
+                <button data-position="bottom-left" data-type="message" class="btn btn-message">Message</button>
+            </div>
+            <div class="bottom-row text-right">
+                <button data-position="bottom-right" data-type="success" class="btn btn-success">Success</button>
+                <button data-position="bottom-right" data-type="info" class="btn btn-info">Info</button>
+                <button data-position="bottom-right" data-type="error" class="btn btn-error">Error</button><br>
+                <button data-position="bottom-right" data-type="warning" class="btn btn-warning">Warning</button>
+                <button data-position="bottom-right" data-type="message" class="btn btn-message">Message</button>
+            </div>
+        </div>
+        <h2>Custom Notification</h2>
+        <p>Use this form to customize all properties of a notification.</p>
+        <form id="custom">
+            <div class="group">
+                <label for="type">Type</label>
+                <select name="type" id="type">
+                    <option value="success" selected>Success</option>
+                    <option value="info">Information</option>
+                    <option value="error">Error</option>
+                    <option value="warning">Warning</option>
+                    <option value="message">Message</option>
+                </select>
+            </div>
+            <div class="group">
+                <label for="position">Position</label>
+                <select name="position" id="position">
+                    <option value="top-left">top-left</option>
+                    <option value="top-right" selected>top-right (default)</option>
+                    <option value="bottom-left">bottom-left</option>
+                    <option value="bottom-right">bottom-right</option>
+                </select>
+            </div>
+            <div class="group">
+                <label>Sticky</label>
+                <label><input type="radio" name="sticky" name="sticky" value="0" checked> No</label>
+                <label><input type="radio" name="sticky" name="sticky" value="1"> Yes</label>
+            </div>
+            <div class="group">
+                <label for="duration">Display duration (ms)</label>
+                <input type="number" name="duration" id="duration" value="4000" placeholder="Duration (ms)" />
+            </div>
+            <div class="group">
+                <label for="fadeout">Fadeout duration (ms)</label>
+                <input type="number" name="fadeout" id="fadeout" value="750" placeholder="Fadeout (ms)" />
+            </div>
+            <div class="group">
+                <label for="title">Title</label>
+                <input type="text" name="title" id="title" value="Title" placeholder="Title" />
+            </div>
+            <div class="group">
+                <label for="image">Image</label>
+                <input type="text" name="image" id="image" placeholder="Image" />
+            </div>
+            <div class="group">
+                <label for="text">Content</label>
+                <textarea name="text" id="text" value="Content" placeholder="Notification content"></textarea>
+            </div>
+            <div class="group text-right">
+                <input type="submit" class="btn btn-submit" value="Show" />
+            </div>
+        </form>
+    </main>
+    <script src="src/simpleNotification.js"></script>
+    <script>
+    // Texts
+    let texts = [
+        "Content",
+        "Can be multi-line using \"\\r\\n\"\r\nLike this."
+    ];
+    let maxText = texts.length;
+    let currentText = 0;
+    // Make buttons show notifications
+    document.querySelectorAll("[data-position]").forEach(button => {
+        button.addEventListener("click", event => {
+            SimpleNotification[event.target.dataset.type]("Title", texts[currentText], {position: event.target.dataset.position});
+            currentText = (currentText+1)%maxText;
+        });
+    })
+    // Custom
+    document.getElementById("custom").addEventListener("submit", event => {
+        event.preventDefault();
+        let form = event.target;
+        let options = {
+            position: form.position.value,
+            duration: parseInt(form.duration.value),
+            fadeout: parseInt(form.fadeout.value),
+            sticky: parseInt(form.sticky.value),
+            image: form.image.value
+        };
+        SimpleNotification[form.type.value](form.title.value, form.text.value, options);
+    });
+    </script>
+</body>
+</html>
