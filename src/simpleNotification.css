@@ -67,6 +67,7 @@
     pointer-events: all;
     min-width: 20rem;
     max-width: 30rem;
+    z-index: 1080;
 }
 
 .gn-notification h1 {
