@@ -50,10 +50,10 @@ class SimpleNotification {
         // Pause on hover if not sticky
         if (!options.sticky) {
             notification.addEventListener("mouseenter", event => {
-                event.target.lastElementChild.style.animationPlayState = "paused";
+                event.target.lastElementChild.classList.remove("gn-extinguish");
             });
             notification.addEventListener("mouseleave", event => {
-                event.target.lastElementChild.style.animationPlayState = "running";
+                event.target.lastElementChild.classList.add("gn-extinguish");
             });
         }
         // Apply Style
@@ -91,7 +91,15 @@ class SimpleNotification {
             notificationLife.className = "gn-lifespan";
             // Set the time before removing the notification
             notificationLife.style.animationDuration = options.duration + "ms";
-            notificationLife.classList.add("gn-extinguish");
+            if (document.hasFocus()) {
+                notificationLife.classList.add("gn-extinguish");
+            } else {
+                let addExtinguish = () => {
+                    notificationLife.classList.add("gn-extinguish");
+                    document.removeEventListener("focus", addExtinguish);
+                };
+                document.addEventListener("focus", addExtinguish);
+            }
             // Destroy the notification when the animation end
             notificationLife.addEventListener("animationend", event => {
                 if (event.animationName == "shorten") {
