@@ -11,6 +11,7 @@
             background-color: rgba(70, 137, 61, 1);
             margin: 0;
             padding: 0;
+            font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
         }
 
         #filter {
@@ -136,6 +137,20 @@
             width: calc(100% - 0.25rem);
             padding: 0.25rem;
         }
+
+        /* Custom */
+        .gn-cs-under {
+            text-decoration: underline;
+        }
+
+        .gn-custom {
+            background-color: pink;
+            color: white;
+        }
+
+        .gn-custom p {
+            color: rgba(117, 9, 9, 0.945);
+        }
     </style>
 </head>
 <body>
@@ -150,6 +165,7 @@
                 <button data-position="top-left" data-type="error" class="btn btn-error">Error</button><br>
                 <button data-position="top-left" data-type="warning" class="btn btn-warning">Warning</button>
                 <button data-position="top-left" data-type="message" class="btn btn-message">Message</button>
+                <button data-position="top-left" data-type="custom" class="btn">Custom</button>
             </div>
             <div class="text-right">
                 <button data-position="top-right" data-type="success" class="btn btn-success">Success</button>
@@ -157,6 +173,7 @@
                 <button data-position="top-right" data-type="error" class="btn btn-error">Error</button><br>
                 <button data-position="top-right" data-type="warning" class="btn btn-warning">Warning</button>
                 <button data-position="top-right" data-type="message" class="btn btn-message">Message</button>
+                <button data-position="top-right" data-type="custom" class="btn">Custom</button>
             </div>
             <div class="bottom-row">
                 <button data-position="bottom-left" data-type="success" class="btn btn-success">Success</button>
@@ -164,6 +181,7 @@
                 <button data-position="bottom-left" data-type="error" class="btn btn-error">Error</button><br>
                 <button data-position="bottom-left" data-type="warning" class="btn btn-warning">Warning</button>
                 <button data-position="bottom-left" data-type="message" class="btn btn-message">Message</button>
+                <button data-position="bottom-left" data-type="custom" class="btn">Custom</button>
             </div>
             <div class="bottom-row text-right">
                 <button data-position="bottom-right" data-type="success" class="btn btn-success">Success</button>
@@ -171,6 +189,7 @@
                 <button data-position="bottom-right" data-type="error" class="btn btn-error">Error</button><br>
                 <button data-position="bottom-right" data-type="warning" class="btn btn-warning">Warning</button>
                 <button data-position="bottom-right" data-type="message" class="btn btn-message">Message</button>
+                <button data-position="bottom-right" data-type="custom" class="btn">Custom</button>
             </div>
         </div>
         <h2>Custom Notification</h2>
@@ -227,17 +246,29 @@
     </main>
     <script src="src/simpleNotification.js"></script>
     <script>
-    // Texts
+    // Add Tag
+    SimpleNotification.addTag('under', {
+        class: 'gn-cs-under',
+        open: '__', close: '__'
+    });
+    // Data
     let texts = [
         "Content",
-        "Can be multi-line using \"\\r\\n\"\r\nLike this."
+        "Can be multi-line using ``\\r``, ``\\r\\n`` or ``\\n``.\r\nLike this.",
+        "Text can be *styled* **easily**, contain links {{https://notification.nikurasu.org/}} and even ``code`` !",
+        "#More Style\r\n##With headers !\r\n",
+        "You can also easily __add__ your own style with ``SimpleNotification.addTag()``.\r\nSee {{https://github.com/Glagan/SimpleNotification#text-tag}} to know how.",
     ];
     let maxText = texts.length;
     let currentText = 0;
     // Make buttons show notifications
     document.querySelectorAll("[data-position]").forEach(button => {
         button.addEventListener("click", event => {
-            SimpleNotification[event.target.dataset.type]("Title", texts[currentText], {position: event.target.dataset.position});
+            if (event.target.dataset.type == 'custom') {
+                SimpleNotification.custom(["gn-custom"], "Title", texts[currentText], {position: event.target.dataset.position});
+            } else {
+                SimpleNotification[event.target.dataset.type]("Title", texts[currentText], {position: event.target.dataset.position});
+            }
             currentText = (currentText+1)%maxText;
         });
     })

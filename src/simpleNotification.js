@@ -22,6 +22,88 @@ class SimpleNotification {
     }
 
     /**
+     * Transform a text with tags to a DOM Tree
+     * @param {object} notificationText The node where the text will be added
+     * @param {string} text The text with tags
+     */
+    static treeFromText(node, text) {
+        // Normalize linebreak
+        text = text.replace(/(\r?\n|\r)/gm, '\n');
+        // Find tokens
+        let specialNodes = [];
+        let specialCount = 0;
+        Object.keys(SimpleNotification.tags).forEach(tagName => {
+            let tag = SimpleNotification.tags[tagName];
+            let lastTokenPos = 0;
+            // Tag length
+            let tagLength = {open: tag.open.length, close: tag.close.length};
+            // Find strings that match tag
+            let foundOpenPos, foundClosePos;
+            while ((foundOpenPos = text.indexOf(tag.open, lastTokenPos)) > -1) {
+                foundOpenPos += tagLength.open; // Add the tag length to the found position
+                // Find the closing tag
+                if ((foundClosePos = text.indexOf(tag.close, foundOpenPos)) > -1 && foundOpenPos != foundClosePos) {
+                    // Add the found tag to the list
+                    specialNodes.push({
+                        type: tagName,
+                        content: text.substring(foundOpenPos, foundClosePos)
+                    });
+                    // Replace the string by a token \id\
+                    // Remove the tagLength from foundOpenPos to capture the tag
+                    // Add the tagLength to foundClosePos to also capture the tag
+                    let newText = text.substring(0, foundOpenPos-tagLength.open) + '\\' + specialCount + '\\' + text.substring(foundClosePos+tagLength.close);
+                    text = newText;
+                    specialCount++;
+                }
+                // Update lastTokenPos to reduce the string length to search
+                lastTokenPos = foundOpenPos;
+            }
+        });
+        if (specialNodes.length > 0) {
+            let parts = text.split(/\\(\d+)\\/);
+            let lastPart = parts.length;
+            for (let i = 0; i < lastPart; i++) {
+                // even index is simple text
+                if (i%2 == 0) {
+                    node.appendChild(document.createTextNode(parts[i]));
+                } else {
+                    let specialNode = specialNodes[parseInt(parts[i])];
+                    let tagInfo = SimpleNotification.tags[specialNode.type];
+                    let tag = document.createElement(tagInfo.type);
+                    // Set an attribute is 'set' is defined
+                    if (tagInfo.set != undefined) {
+                        tag.setAttribute(tagInfo.set, specialNode.content);
+                    }
+                    tag.textContent = specialNode.content;
+                    // Set a class if defined
+                    tag.className = tagInfo.class || "";
+                    node.appendChild(tag);
+                }
+            }
+        } else {
+            node.textContent = text;
+        }
+    }
+
+    /**
+     * Add the class "gn-extinguish" to the event target
+     * Used in create() and destroy() to be able to remove the eventListener.
+     * @param {object} event The fired event
+     */
+    static addExtinguish(event) {
+        event.target.lastElementChild.classList.add("gn-extinguish");
+    }
+
+    /**
+     * Remove the class "gn-extinguish" to the event target
+     * Used in create() and destroy() to be able to remove the eventListener.
+     * @param {object} event The fired event
+     */
+    static removeExtinguish(event) {
+        event.target.lastElementChild.classList.remove("gn-extinguish");
+    }
+
+    /**
      * Create and append a notification
      * Options: duration, fadeout, position, image
      * @param {array} classes Array of classes to add to the notification
@@ -49,12 +131,8 @@ class SimpleNotification {
         });
         // Pause on hover if not sticky
         if (!options.sticky) {
-            notification.addEventListener("mouseenter", event => {
-                event.target.lastElementChild.classList.remove("gn-extinguish");
-            });
-            notification.addEventListener("mouseleave", event => {
-                event.target.lastElementChild.classList.add("gn-extinguish");
-            });
+            notification.addEventListener("mouseenter", SimpleNotification.removeExtinguish);
+            notification.addEventListener("mouseleave", SimpleNotification.addExtinguish);
         }
         // Apply Style
         notification.className = "gn-notification";
@@ -79,7 +157,7 @@ class SimpleNotification {
             }
             if (hasText) {
                 let notificationText = document.createElement("p");
-                notificationText.textContent = text;
+                SimpleNotification.treeFromText(notificationText, text);
                 notificationContent.appendChild(notificationText);
             }
             notification.appendChild(notificationContent);
@@ -114,6 +192,15 @@ class SimpleNotification {
     }
 
     /**
+     * Add a tag for the treeFromText function
+     * @param {string} name The name of the tag
+     * @param {object} object The values of the tag
+     */
+    static addTag(name, object) {
+        SimpleNotification.tags[name] = object;
+    }
+
+    /**
      * Remove a notification from the screen
      * @param {object} notification The notification to remove
      */
@@ -121,7 +208,9 @@ class SimpleNotification {
         if (fadeout == 0) {
             notification.parentElement.removeChild(notification);
         }
-
+        // Remove the timer animation
+        notification.removeEventListener("mouseenter", SimpleNotification.removeExtinguish);
+        notification.removeEventListener("mouseleave", SimpleNotification.addExtinguish);
         // Add the fadeout animation
         notification.style.animationDuration = fadeout + "ms";
         notification.classList.add("gn-fadeout");
@@ -208,4 +297,42 @@ SimpleNotification.default = {
     duration: 4000,
     fadeout: 750,
     sticky: false
+};
+SimpleNotification.tags = {
+    code: {
+        type: 'code',
+        class: 'gn-code',
+        open: '``',
+        close: '``'
+    },
+    header3: {
+        type: 'h3',
+        class: 'gn-header',
+        open: '##',
+        close: "\n"
+    },
+    header2: {
+        type: 'h2',
+        class: 'gn-header',
+        open: '#',
+        close: "\n"
+    },
+    link: {
+        type: 'a',
+        set: 'href',
+        open: '{{',
+        close: '}}'
+    },
+    bold: {
+        type: 'span',
+        class: 'gn-bold',
+        open: '**',
+        close: '**'
+    },
+    italic: {
+        type: 'span',
+        class: 'gn-italic',
+        open: '*',
+        close: '*'
+    },
 };

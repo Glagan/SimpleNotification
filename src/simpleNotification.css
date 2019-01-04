@@ -30,6 +30,7 @@
 .gn-bottom-right {
     align-items: flex-end;
 }
+
 .gn-top-left,
 .gn-bottom-left {
     align-items: flex-start;
@@ -56,6 +57,7 @@
 }
 
 .gn-notification {
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
     /*border: 1px solid black;*/
     box-shadow: 1px 1px 3px black;
     border-radius: 3px;
@@ -86,6 +88,10 @@
     flex: 1;
     align-content: space-between;
     align-items: center;
+}
+
+.gn-content h2, .gn-content h3 {
+    margin: 0.5rem 0;
 }
 
 .gn-content img {
@@ -148,4 +154,22 @@
 .gn-message {
     background-color: #333333;
     color: white;
+}
+
+.gn-bold {
+    font-weight: bold;
+}
+
+.gn-italic {
+    font-style: italic;
+}
+
+.gn-code {
+    font-family: SFMono-Regular, Menlo, "Lucida Console", Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    padding: 0.1rem 0.2rem;
+    background-color: #333333;
+    color: #f7f7f7;
+    line-height: 1.4;
+    border-radius: 2px;
+    box-shadow: 0 0 1px #333333;
 }
