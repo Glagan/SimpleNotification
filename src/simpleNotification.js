@@ -22,7 +22,28 @@ class SimpleNotification {
     }
 
     /**
+     * Search the first occurence of the char occurence in text that doesn't have a \ prefix
+     * @param {string} text The text where to search the char in
+     * @param {string} char The string to search in the text
+     * @param {integer} start The position to begin to search with
+     */
+    static firstUnbreakChar(text, char, start=0) {
+        if (start < 0) start = 0;
+        let foundPos;
+        while (start >= 0) {
+            foundPos = text.indexOf(char, start);
+            if (foundPos > 0 && text[foundPos-1] == '\\') {
+                start = foundPos+1;
+            } else {
+                start = -1;
+            }
+        }
+        return foundPos;
+    }
+
+    /**
      * Transform a text with tags to a DOM Tree
+     * {open}content{close} {open}{"|'|}title{"|'|}:{"|'|}content{"|'|}{close}
      * @param {object} notificationText The node where the text will be added
      * @param {string} text The text with tags
      */
@@ -43,11 +64,26 @@ class SimpleNotification {
                 foundOpenPos += tagLength.open; // Add the tag length to the found position
                 // Find the closing tag
                 if ((foundClosePos = text.indexOf(tag.close, foundOpenPos)) > -1 && foundOpenPos != foundClosePos) {
-                    // Add the found tag to the list
-                    specialNodes.push({
+                    let foundResult = {
                         type: tagName,
                         content: text.substring(foundOpenPos, foundClosePos)
-                    });
+                    };
+                    // Search for title if tag can have one
+                    if (tag.title !== undefined && foundResult.content.length > 0) {
+                        if (foundResult.content[0] == '!') {
+                            foundResult.content = foundResult.content.substring(1);
+                        } else {
+                            // find :
+                            let foundTitleBreak = SimpleNotification.firstUnbreakChar(foundResult.content, ':');
+                            foundResult.content = foundResult.content.replace('\\:', ':');
+                            if (foundTitleBreak > -1) {
+                                foundResult.title = foundResult.content.substring(0, foundTitleBreak);
+                                foundResult.content = foundResult.content.substring(foundTitleBreak + 1);
+                            }
+                        }
+                    }
+                    // Add the found tag to the list
+                    specialNodes.push(foundResult);
                     // Replace the string by a token \id\
                     // Remove the tagLength from foundOpenPos to capture the tag
                     // Add the tagLength to foundClosePos to also capture the tag
@@ -74,7 +110,16 @@ class SimpleNotification {
                     if (tagInfo.set != undefined) {
                         tag.setAttribute(tagInfo.set, specialNode.content);
                     }
-                    tag.textContent = specialNode.content;
+                    console.log(specialNode);
+                    if (specialNode.title !== undefined && tagInfo.title == 'content') {
+                        tag.textContent = specialNode.title;
+                    } else {
+                        tag.textContent = specialNode.content;
+                        // Add title attribute if not empty
+                        if (specialNode.title !== undefined && tagInfo.title !== undefined) {
+                            tag.setAttribute(tagInfo.title, specialNode.title);
+                        }
+                    }
                     // Set a class if defined
                     tag.className = tagInfo.class || "";
                     node.appendChild(tag);
@@ -135,13 +180,14 @@ class SimpleNotification {
             notification.addEventListener("mouseleave", SimpleNotification.addExtinguish);
         }
         // Apply Style
-        notification.className = "gn-notification";
+        notification.className = "gn-notification gn-insert";
         classes.forEach(element => {
             notification.classList.add(element);
         });
         // Add elements
         if (title != undefined && title != "") {
             let notificationTitle = document.createElement("h1");
+            notificationTitle.title = title;
             notificationTitle.textContent = title;
             notification.appendChild(notificationTitle);
         }
@@ -167,23 +213,32 @@ class SimpleNotification {
         if (options.sticky == undefined || options.sticky == false) {
             notificationLife = document.createElement("span");
             notificationLife.className = "gn-lifespan";
-            // Set the time before removing the notification
-            notificationLife.style.animationDuration = options.duration + "ms";
-            if (document.hasFocus()) {
-                notificationLife.classList.add("gn-extinguish");
-            } else {
-                let addExtinguish = () => {
-                    notificationLife.classList.add("gn-extinguish");
-                    document.removeEventListener("focus", addExtinguish);
-                };
-                document.addEventListener("focus", addExtinguish);
-            }
-            // Destroy the notification when the animation end
-            notificationLife.addEventListener("animationend", event => {
-                if (event.animationName == "shorten") {
-                    SimpleNotification.destroy(notification, options.fadeout);
+            // Put the extinguish in a event listener to start when insert animation is done
+            let startOnInsertFinish = event => {
+                if (event.animationName == "insert-left" || event.animationName == "insert-right") {
+                    // Set the time before removing the notification
+                    notificationLife.style.animationDuration = options.duration + "ms";
+                    if (document.hasFocus()) {
+                        notificationLife.classList.add("gn-extinguish");
+                    } else {
+                        let addFocusExtinguish = () => {
+                            notificationLife.classList.add("gn-extinguish");
+                            document.removeEventListener("focus", addFocusExtinguish);
+                        };
+                        document.addEventListener("focus", addFocusExtinguish);
+                    }
+                    // Destroy the notification when the animation end
+                    notificationLife.addEventListener("animationend", event => {
+                        if (event.animationName == "shorten") {
+                            SimpleNotification.destroy(notification, options.fadeout);
+                        }
+                    });
+                    // Remove event and style
+                    notification.classList.remove("gn-insert");
+                    notification.removeEventListener("animationend", startOnInsertFinish);
                 }
-            });
+            };
+            notification.addEventListener("animationend", startOnInsertFinish);
             notification.appendChild(notificationLife);
         }
         // Display
@@ -320,6 +375,7 @@ SimpleNotification.tags = {
     link: {
         type: 'a',
         set: 'href',
+        title: 'content',
         open: '{{',
         close: '}}'
     },

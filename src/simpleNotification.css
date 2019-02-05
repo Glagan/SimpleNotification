@@ -16,6 +16,28 @@
     }
 }
 
+@keyframes insert-left {
+    from {
+        transform: rotateY(-70deg);
+        transform-origin: left;
+    }
+    to {
+        transform: rotateY(0deg);
+        transform-origin: left;
+    }
+}
+
+@keyframes insert-right {
+    from {
+        transform: rotateY(-70deg);
+        transform-origin: right;
+    }
+    to {
+        transform: rotateY(0deg);
+        transform-origin: right;
+    }
+}
+
 .gn-wrapper {
     position: fixed;
     overflow: hidden;
@@ -58,7 +80,6 @@
 
 .gn-notification {
     font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
-    /*border: 1px solid black;*/
     box-shadow: 1px 1px 3px black;
     border-radius: 3px;
     overflow: hidden;
@@ -68,16 +89,35 @@
     animation-timing-function: cubic-bezier(0.165, 0.84, 0.44, 1);
     animation-fill-mode: forwards;
     pointer-events: all;
-    min-width: 20rem;
-    max-width: 30rem;
+    min-width: 10rem;
+    max-width: 25rem;
+}
+
+.gn-insert {
+    animation-duration: 250ms;
+    animation-timing-function: cubic-bezier(0.23, 1, 0.320, 1);
+    animation-fill-mode: forwards;
+}
+
+.gn-top-left .gn-insert,
+.gn-bottom-left .gn-insert {
+    animation-name: insert-left;
+}
+
+.gn-top-right .gn-insert,
+.gn-bottom-right .gn-insert {
+    animation-name: insert-right;
 }
 
 .gn-notification h1 {
     background-color: rgba(0, 0, 0, 0.2);
     border-bottom: 1px solid rgba(0, 0, 0, 0.4);
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .gn-fadeout {
+    animation-duration: 1000ms;
     animation-name: fadeout;
     animation-timing-function: linear;
     animation-fill-mode: forwards;
@@ -103,6 +143,7 @@
 .gn-content p {
     max-width: 100%;
     white-space: pre-line;
+    word-break: break-word;
 }
 
 .gn-content img:only-child,
@@ -126,6 +167,7 @@
 }
 
 .gn-extinguish {
+    animation-duration: 1000ms;
     animation-name: shorten;
     animation-timing-function: linear;
     animation-fill-mode: forwards;
