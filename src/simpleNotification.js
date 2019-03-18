@@ -110,7 +110,6 @@ class SimpleNotification {
                     if (tagInfo.set != undefined) {
                         tag.setAttribute(tagInfo.set, specialNode.content);
                     }
-                    console.log(specialNode);
                     if (specialNode.title !== undefined && tagInfo.title == 'content') {
                         tag.textContent = specialNode.title;
                     } else {
