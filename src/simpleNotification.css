@@ -129,32 +129,30 @@
     align-content: space-between;
     align-items: center;
 }
-
 .gn-content h2, .gn-content h3 {
     margin: 0.5rem 0;
 }
-
 .gn-content img {
     max-width: 40%;
     max-height: 20rem;
     flex-shrink: 0;
 }
-
 .gn-content p {
     max-width: 100%;
     white-space: pre-line;
     word-break: break-word;
 }
-
 .gn-content img:only-child,
 .gn-content p:only-child {
     max-width: 100%;
 }
-
 .gn-notification h1,
 .gn-content p {
     padding: 0.5rem;
     margin: 0;
+}
+.gn-content a {
+    color: rgba(255, 255, 255, 0.8);
 }
 
 .gn-lifespan {
@@ -165,7 +163,6 @@
     transition-property: width;
     transition-timing-function: linear;
 }
-
 .gn-extinguish {
     animation-duration: 1000ms;
     animation-name: shorten;
@@ -177,22 +174,18 @@
     background-color: #689f38;
     color: white;
 }
-
 .gn-info {
     background-color: #0288d1;
     color: white;
 }
-
 .gn-error {
-    background-color: #e53935;
+    background-color: #b42f2d;
     color: white;
 }
-
 .gn-warning {
-    background-color: #ff8f00;
+    background-color: #d87a00;
     color: white;
 }
-
 .gn-message {
     background-color: #333333;
     color: white;
@@ -201,11 +194,9 @@
 .gn-bold {
     font-weight: bold;
 }
-
 .gn-italic {
     font-style: italic;
 }
-
 .gn-code {
     font-family: SFMono-Regular, Menlo, "Lucida Console", Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
     padding: 0.1rem 0.2rem;

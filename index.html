@@ -7,56 +7,62 @@
     <title>Glagan/SimpleNotification</title>
     <link rel="stylesheet" type="text/css" media="screen" href="src/simpleNotification.css" />
     <style>
+        :root {
+            --background-1: rgb(33, 37, 43);
+            --background-2: rgb(40, 44, 52);
+            --background-main: rgb(56, 62, 74);
+            --border: rgb(76, 81, 92);
+        }
+        * {
+            margin: 0;
+            padding: 0;
+        }
         body {
-            background-color: rgba(70, 137, 61, 1);
+            background: linear-gradient(var(--background-1), var(--background-2));
             margin: 0;
             padding: 0;
             font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
-        }
-
-        #filter {
-            z-index: -1;
-            position: fixed;
-            left: 0;
-            top: 0;
-            bottom: 0;
-            right: 0;
-            box-shadow: inset 0px 0px 300px 50px rgba(0, 0, 0, 0.75);
-        }
-
-        main {
-            width: 60%;
-            margin: 0.5rem auto;
-            background-color: rgb(53, 64, 79, 0.6);
-            border: 1px solid rgb(53, 64, 79, 0.6);
-            box-shadow: 0 0 5px rgb(53, 64, 79, 0.6);
-            border-radius: 4px;
-            padding: 1rem;
             color: white;
         }
 
+        main {
+            min-height: 100vh;
+            width: 60%;
+            margin-left: auto;
+            margin-right: auto;
+            background-color: var(--background-main);
+            border-left: 1px solid var(--border);
+            border-right: 1px solid var(--border);
+            box-shadow: 0 0 4px var(--border);
+        }
+        @media (max-width: 992px) {
+            main {
+                width: 100%;
+            }
+        }
         main h1,
         main h2 {
-            margin-top: 0.5rem;
-            margin-bottom: 0.5rem;
+            padding: 0.75rem;
+            border-bottom: 1px solid var(--border);
         }
-
+        main > * {
+            padding: 0.5rem;
+        }
         main > h1 > a {
             color: rgba(255, 255, 255, 0.8);
             text-decoration: none;
         }
-
         main > h1 > a:hover {
             text-decoration: underline;
         }
 
         .columns-container {
-            width: 100%;
             display: flex;
             flex-wrap: wrap;
             justify-content: space-between;
             border: 1px solid black;
             border-radius: 4px;
+            margin: 0 1rem;
             background-color: rgba(158, 158, 158, 0.4);
         }
 
@@ -73,88 +79,124 @@
             text-align: right;
         }
 
+        /* Buttons */
         .btn {
             border: 0;
             padding: 0.4rem;
             margin: 0.2rem;
             border-radius: 4px;
+            cursor: pointer;
+            color: white;
         }
-
         .btn-success {
             background-color: #689f38;
             box-shadow: 1px 1px 3px #689f38;
-            color: white;
         }
-
         .btn-info {
             background-color: #0288d1;
             box-shadow: 1px 1px 3px #0288d1;
-            color: white;
         }
-
         .btn-error {
             background-color: #e53935;
             box-shadow: 1px 1px 3px #e53935;
-            color: white;
         }
-
         .btn-warning {
             background-color: #ff8f00;
             box-shadow: 1px 1px 3px #ff8f00;
-            color: white;
         }
-
         .btn-message {
             background-color: #333333;
             box-shadow: 1px 1px 3px #333333;
-            color: white;
         }
-
+        .btn-custom {
+            color: black;
+        }
         .btn-submit {
-            background-color: #004d40;
-            box-shadow: 1px 1px 3px #004d40;
-            color: white;
+            font-size: 1.5rem;
+            margin-left: auto;
         }
 
-        #custom {
+        /* Form */
+        .form {
             display: flex;
             flex-wrap: wrap;
         }
-
-        #custom > .group {
+        .form label {
+            display: block;
+            font-size: 1.1rem;
+        }
+        .form input,
+        .form select,
+        .form textarea {
+            padding: 0.25rem;
+            border-radius: 0.25rem;
+            border: 1px solid var(--border);
+            font-family:'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+        }
+        .form textarea {
+            max-width: 100%;
+            resize: vertical;
+        }
+        .form .long {
+            width: calc(100% - 0.5rem);
+        }
+        .form input::placeholder,
+        .form textarea::placeholder {
+            font-size: 1rem;
+            font-style: italic;
+        }
+        .row {
             width: 100%;
             margin-bottom: 1rem;
+            display: flex;
+            flex-flow: row nowrap;
+            justify-content: stretch;
+        }
+        .row-submit {
+            text-align: center;
+        }
+        .column {
+            flex: 1;
+            margin-right: 1rem;
+        }
+        .column:last-child {
+            margin-right: 0;
+        }
+        label.inline {
+            display: inline;
         }
 
-        .group > label {
-            display: block;
-            margin-bottom: 0.5rem;
+        /* Alert */
+        .alert {
+            width: 100%;
+            border-radius: 0.25rem;
+            margin-bottom: 1rem;
         }
-
-        .group > input,
-        .group select,
-        .group textarea {
-            width: calc(100% - 0.25rem);
-            padding: 0.25rem;
+        .alert-info {
+            border: 2px solid #016499;
+            padding: 0.5rem;
+            padding-left: 2.2rem;
+            background-position: center left;
+            background-repeat: no-repeat;
+            background-color: #0288d1;
+            background-image: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/PjwhRE9DVFlQRSBzdmcgIFBVQkxJQyAnLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4nICAnaHR0cDovL3d3dy53My5vcmcvR3JhcGhpY3MvU1ZHLzEuMS9EVEQvc3ZnMTEuZHRkJz48c3ZnIGhlaWdodD0iNTEycHgiIGlkPSJMYXllcl8xIiBzdHlsZT0iZW5hYmxlLWJhY2tncm91bmQ6bmV3IDAgMCA1MTIgNTEyIiBmaWxsPSJ3aGl0ZSIgdmVyc2lvbj0iMS4xIiB2aWV3Qm94PSIwIDAgNTEyIDUxMiIgd2lkdGg9IjUxMnB4IiB4bWw6c3BhY2U9InByZXNlcnZlIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIj48Zz48cGF0aCBkPSJNNDgwLDI1M0M0NzguMywxMjkuMywzNzYuNywzMC40LDI1MywzMlMzMC40LDEzNS4zLDMyLDI1OWMxLjcsMTIzLjcsMTAzLjMsMjIyLjYsMjI3LDIyMUMzODIuNyw0NzguMyw0ODEuNywzNzYuNyw0ODAsMjUzICAgeiBNMjU2LDExMS45YzE3LjcsMCwzMiwxNC4zLDMyLDMycy0xNC4zLDMyLTMyLDMyYy0xNy43LDAtMzItMTQuMy0zMi0zMlMyMzguMywxMTEuOSwyNTYsMTExLjl6IE0zMDAsMzk1aC04OHYtMTFoMjJWMjI0aC0yMnYtMTIgICBoNjZ2MTcyaDIyVjM5NXoiLz48L2c+PC9zdmc+);
+            background-size: 2rem;
         }
 
         /* Custom */
         .gn-cs-under {
             text-decoration: underline;
         }
-
         .gn-custom {
             background-color: pink;
             color: white;
         }
-
         .gn-custom p {
             color: rgba(117, 9, 9, 0.945);
         }
     </style>
 </head>
 <body>
-    <div id="filter"></div>
     <main>
         <h1>Glagan/SimpleNotification (<a href="https://github.com/Glagan/SimpleNotification">Github</a>)</h1>
         <p>Click buttons to create notifications.</p>
@@ -165,7 +207,7 @@
                 <button data-position="top-left" data-type="error" class="btn btn-error">Error</button><br>
                 <button data-position="top-left" data-type="warning" class="btn btn-warning">Warning</button>
                 <button data-position="top-left" data-type="message" class="btn btn-message">Message</button>
-                <button data-position="top-left" data-type="custom" class="btn">Custom</button>
+                <button data-position="top-left" data-type="custom" class="btn btn-custom">Custom</button>
             </div>
             <div class="text-right">
                 <button data-position="top-right" data-type="success" class="btn btn-success">Success</button>
@@ -173,7 +215,7 @@
                 <button data-position="top-right" data-type="error" class="btn btn-error">Error</button><br>
                 <button data-position="top-right" data-type="warning" class="btn btn-warning">Warning</button>
                 <button data-position="top-right" data-type="message" class="btn btn-message">Message</button>
-                <button data-position="top-right" data-type="custom" class="btn">Custom</button>
+                <button data-position="top-right" data-type="custom" class="btn btn-custom">Custom</button>
             </div>
             <div class="bottom-row">
                 <button data-position="bottom-left" data-type="success" class="btn btn-success">Success</button>
@@ -181,7 +223,7 @@
                 <button data-position="bottom-left" data-type="error" class="btn btn-error">Error</button><br>
                 <button data-position="bottom-left" data-type="warning" class="btn btn-warning">Warning</button>
                 <button data-position="bottom-left" data-type="message" class="btn btn-message">Message</button>
-                <button data-position="bottom-left" data-type="custom" class="btn">Custom</button>
+                <button data-position="bottom-left" data-type="custom" class="btn btn-custom">Custom</button>
             </div>
             <div class="bottom-row text-right">
                 <button data-position="bottom-right" data-type="success" class="btn btn-success">Success</button>
@@ -189,58 +231,67 @@
                 <button data-position="bottom-right" data-type="error" class="btn btn-error">Error</button><br>
                 <button data-position="bottom-right" data-type="warning" class="btn btn-warning">Warning</button>
                 <button data-position="bottom-right" data-type="message" class="btn btn-message">Message</button>
-                <button data-position="bottom-right" data-type="custom" class="btn">Custom</button>
+                <button data-position="bottom-right" data-type="custom" class="btn btn-custom">Custom</button>
             </div>
         </div>
         <h2>Custom Notification</h2>
         <p>Use this form to customize all properties of a notification.</p>
-        <form id="custom">
-            <div class="group">
-                <label for="type">Type</label>
-                <select name="type" id="type">
-                    <option value="success" selected>Success</option>
-                    <option value="info">Information</option>
-                    <option value="error">Error</option>
-                    <option value="warning">Warning</option>
-                    <option value="message">Message</option>
-                </select>
+        <form id="custom" class="form">
+            <div class="row">
+                <div class="column">
+                    <label for="type">Type</label>
+                    <select name="type" id="type">
+                        <option value="success" selected>Success</option>
+                        <option value="info">Information</option>
+                        <option value="error">Error</option>
+                        <option value="warning">Warning</option>
+                        <option value="message">Message</option>
+                    </select>
+                </div>
+                <div class="column">
+                    <label for="position">Position</label>
+                    <select name="position" id="position">
+                        <option value="top-left">top-left</option>
+                        <option value="top-right" selected>top-right (default)</option>
+                        <option value="bottom-left">bottom-left</option>
+                        <option value="bottom-right">bottom-right</option>
+                    </select>
+                </div>
+                <div class="column">
+                    <label>Sticky</label>
+                    <label class="inline"><input type="radio" name="sticky" name="sticky" value="0" checked> No</label>
+                    <label class="inline"><input type="radio" name="sticky" name="sticky" value="1"> Yes</label>
+                </div>
             </div>
-            <div class="group">
-                <label for="position">Position</label>
-                <select name="position" id="position">
-                    <option value="top-left">top-left</option>
-                    <option value="top-right" selected>top-right (default)</option>
-                    <option value="bottom-left">bottom-left</option>
-                    <option value="bottom-right">bottom-right</option>
-                </select>
+            <div class="row">
+                <div class="column">
+                    <label for="duration">Display duration (ms)</label>
+                    <input type="number" name="duration" id="duration" value="4000" placeholder="Duration (ms)" />
+                </div>
+                <div class="column">
+                    <label for="fadeout">Fadeout duration (ms)</label>
+                    <input type="number" name="fadeout" id="fadeout" value="750" placeholder="Fadeout (ms)" />
+                </div>
             </div>
-            <div class="group">
-                <label>Sticky</label>
-                <label><input type="radio" name="sticky" name="sticky" value="0" checked> No</label>
-                <label><input type="radio" name="sticky" name="sticky" value="1"> Yes</label>
+            <p class="alert alert-info"><b>Title</b>, <b>Image</b> and <b>Content</b> are all optionnal, but at least one must be specified.</p>
+            <div class="row">
+                <div class="column">
+                    <label for="title">Title</label>
+                    <input type="text" name="title" id="title" class="long" value="Title" placeholder="Title" />
+                </div>
+                <div class="column">
+                    <label for="image">Image</label>
+                    <input type="text" name="image" id="image" class="long" placeholder="Image" />
+                </div>
             </div>
-            <div class="group">
-                <label for="duration">Display duration (ms)</label>
-                <input type="number" name="duration" id="duration" value="4000" placeholder="Duration (ms)" />
+            <div class="row">
+                <div class="column">
+                    <label for="text">Content</label>
+                    <textarea name="text" id="text" class="long" value="Content" placeholder="Notification content"></textarea>
+                </div>
             </div>
-            <div class="group">
-                <label for="fadeout">Fadeout duration (ms)</label>
-                <input type="number" name="fadeout" id="fadeout" value="750" placeholder="Fadeout (ms)" />
-            </div>
-            <div class="group">
-                <label for="title">Title</label>
-                <input type="text" name="title" id="title" value="Title" placeholder="Title" />
-            </div>
-            <div class="group">
-                <label for="image">Image</label>
-                <input type="text" name="image" id="image" placeholder="Image" />
-            </div>
-            <div class="group">
-                <label for="text">Content</label>
-                <textarea name="text" id="text" value="Content" placeholder="Notification content"></textarea>
-            </div>
-            <div class="group text-right">
-                <input type="submit" class="btn btn-submit" value="Show" />
+            <div class="row row-submit">
+                <button type="submit" class="btn btn-submit btn-success">Show</button>
             </div>
         </form>
     </main>
@@ -256,7 +307,7 @@
         "Content",
         "Can be multi-line using ``\\r``, ``\\r\\n`` or ``\\n``.\r\nLike this.",
         "Text can be *styled* **easily**, contain {{links:https://notification.nikurasu.org/}} and even ``code`` !",
-        "#More Style\r\n##With headers !\r\n",
+        "# More Style\r\n## With headers !\r\n",
         "You can also easily __add__ your own style with ``SimpleNotification.addTag()``.\r\nSee {{!https://github.com/Glagan/SimpleNotification#text-tag}} to know how.",
     ];
     let maxText = texts.length;

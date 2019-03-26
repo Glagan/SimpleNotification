@@ -25,13 +25,14 @@ Each functions have the same parameters:
 
 | Name | Description |
 |---|---|
-| title | (Optional) The title of the notification. |
-| text | (Optional) The content of the notification. |
-| options | (Optional) The parameters for this notification. |
+| title | The title of the notification. |
+| text | The content of the notification. |
+| options | The parameters for this notification. |
+
+> All parameters are optionnal, but at least one is required.
 
 You can use custom classes and make your own design by using ``SimpleNotification.custom(classes, title, text, options)`` where classes is an array of CSS classes that will be added to the body of each notifications.
 
-Both ``title`` and ``text`` are optional, but you need to set at least one of the two.  
 You can jump line inside the notification content by using any linebreak character (``\r``, ``\n`` or ``\r\n``).
 
 ## Options
@@ -53,25 +54,35 @@ You can insert links, or stylize text by using tags that ressemble **Markdown**.
 | Name | Description |
 |---|---|
 | Inline code | \`\`code\`\` |
-| Header (h2) | ``#Header 2\r\n`` |
-| Header (h3) | ``##Header 3\r\n`` |
-| Link | ``{{title:http://www.example.org/}}`` or ``{{!title:http://www.example.org/}}``|
+| Header (h2) | ``# Header 2\r\n`` |
+| Header (h3) | ``## Header 3\r\n`` |
+| Link | ``{{title:http://www.example.org/}}`` or ``{{!http://www.example.org/}}``|
 | Bold | ``**http://www.example.org/**`` |
 | Italic | ``*http://www.example.org/*`` |
 
 You can add custom tags easily by adding them to ``SimpleNotification.tags`` or by using ``SimpleNotification.addTag(name, object)``.  
-A tag object can have the following attributes:
+A tag object can have the following properties:
 
 ```javascript
 {
-    type: 'span', // The node type
-    set: 'attribute', // Optional attribute to set with the content as a value
-    class: 'gn-class', // Optional class list to use
-    title: 'attribute', // See "Title" below
+    type: 'span', // The node type, e.g <span>
+    class: 'class1 class2', // Optional class list (as a string) to use
+    attributes: {
+        name: value
+    }, // Optional attributes to set
+    textContent: "$content", // textContent of the created node, see below for variables
+    title: false, // See "Title" below
     open: '{{', // The opening token - any length
     close: '}}' // The closing token - can be linebreak by using \n
 }
 ```
+
+### Variables
+
+There is 2 usable *variables* inside attributes values, textContent and title:
+
+* ``$content``: the content found between the ``open`` and ``close`` token, without title if there is one
+* ``$title``: the title found, if there is none it is replaced by the same value as ``$content``
 
 ### Title
 
@@ -79,11 +90,9 @@ Tags can have a *title*. It's additional data that can be used for the result.
 
 The title of a tag is found by using the first separator ``:``, you can avoid using a separator by adding a slash before ``\:``.  
 You can also avoid using title for the tag by adding **!** before the content, the following examples are the same and will display a link with the URL as it's displayed content.
+If ``title`` is not defined or set to false, it will ignore the title find step.  
 
 ```
 {{!http://www.example.org/}}
 {{http\://www.example.org/}}
 ```
-
-If no title is found, the result will be the default one.  
-If *title* is set to **"content"**, the content of the title will be set as the ``textContent`` of the result node, else it will be set as an attribute of the node.

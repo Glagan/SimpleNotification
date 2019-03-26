@@ -69,7 +69,7 @@ class SimpleNotification {
                         content: text.substring(foundOpenPos, foundClosePos)
                     };
                     // Search for title if tag can have one
-                    if (tag.title !== undefined && foundResult.content.length > 0) {
+                    if ("title" in tag && tag.title && foundResult.content.length > 0) {
                         if (foundResult.content[0] == '!') {
                             foundResult.content = foundResult.content.substring(1);
                         } else {
@@ -106,21 +106,27 @@ class SimpleNotification {
                     let specialNode = specialNodes[parseInt(parts[i])];
                     let tagInfo = SimpleNotification.tags[specialNode.type];
                     let tag = document.createElement(tagInfo.type);
-                    // Set an attribute is 'set' is defined
-                    if (tagInfo.set != undefined) {
-                        tag.setAttribute(tagInfo.set, specialNode.content);
+                    // Set attributes
+                    if ('attributes' in tagInfo) {
+                        Object.keys(tagInfo.attributes).forEach(attributeName => {
+                            let attributeValue = tagInfo.attributes[attributeName]
+                                .replace('$content', specialNode.content)
+                                .replace('$title', ('title' in specialNode) ? specialNode.title : specialNode.content);
+                            tag.setAttribute(attributeName, attributeValue);
+                        });
                     }
-                    if (specialNode.title !== undefined && tagInfo.title == 'content') {
-                        tag.textContent = specialNode.title;
+                    // Text content based on tagInfo.textcontent
+                    let textContent = undefined;
+                    if ('textContent' in tagInfo) {
+                        textContent = tagInfo.textContent
+                            .replace('$content', specialNode.content)
+                            .replace('$title', ('title' in specialNode) ? specialNode.title : specialNode.content);
                     } else {
-                        tag.textContent = specialNode.content;
-                        // Add title attribute if not empty
-                        if (specialNode.title !== undefined && tagInfo.title !== undefined) {
-                            tag.setAttribute(tagInfo.title, specialNode.title);
-                        }
+                        textContent = specialNode.content;
                     }
+                    tag.textContent = textContent;
                     // Set a class if defined
-                    tag.className = tagInfo.class || "";
+                    tag.className = tagInfo.class || '';
                     node.appendChild(tag);
                 }
             }
@@ -170,9 +176,7 @@ class SimpleNotification {
         let notification = document.createElement("div");
         // Events
         // Delete the notification on click
-        notification.addEventListener("click", () => {
-            SimpleNotification.destroy(notification, 0);
-        });
+        notification.addEventListener("click", SimpleNotification.destroy.bind(null, notification, 0));
         // Pause on hover if not sticky
         if (!options.sticky) {
             notification.addEventListener("mouseenter", SimpleNotification.removeExtinguish);
@@ -209,7 +213,7 @@ class SimpleNotification {
         }
         // Add progress bar if not sticky
         let notificationLife;
-        if (options.sticky == undefined || options.sticky == false) {
+        if (!("sticky" in options) || options.sticky == false) {
             notificationLife = document.createElement("span");
             notificationLife.className = "gn-lifespan";
             // Put the extinguish in a event listener to start when insert animation is done
@@ -350,7 +354,7 @@ SimpleNotification.default = {
     position: "top-right",
     duration: 4000,
     fadeout: 750,
-    sticky: false
+    sticky: false,
 };
 SimpleNotification.tags = {
     code: {
@@ -362,19 +366,23 @@ SimpleNotification.tags = {
     header3: {
         type: 'h3',
         class: 'gn-header',
-        open: '##',
+        open: '## ',
         close: "\n"
     },
     header2: {
         type: 'h2',
         class: 'gn-header',
-        open: '#',
-        close: "\n"
+        open: '# ',
+        close: '\n'
     },
     link: {
         type: 'a',
-        set: 'href',
-        title: 'content',
+        title: true,
+        attributes: {
+            'href': '$content',
+            'target': 'blank',
+        },
+        textContent: '$title',
         open: '{{',
         close: '}}'
     },
