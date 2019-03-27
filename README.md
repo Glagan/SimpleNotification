@@ -27,6 +27,7 @@ Each functions have the same parameters:
 |---|---|
 | title | The title of the notification. |
 | text | The content of the notification. |
+| image | Add an image next to the notification content. |
 | options | The parameters for this notification. |
 
 > All parameters are optional, but at least one is required.
@@ -45,7 +46,6 @@ There is a few options that you can set by using ``SimpleNotification.options(ob
 | fadeout | The duration of the fadeout animation when the notification display time is over. |
 | position | Valid positions: ``top-left``, ``top-right``, ``bottom-left`` and ``bottom-right``. |
 | sticky | If set to true, the notification will not disappear until the user click it. |
-| image | Add an image next to the notification content. |
 
 ## Text Tag
 
