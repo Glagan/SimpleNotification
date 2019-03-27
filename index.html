@@ -262,6 +262,16 @@
                     <label class="inline"><input type="radio" name="sticky" name="sticky" value="0" checked> No</label>
                     <label class="inline"><input type="radio" name="sticky" name="sticky" value="1"> Yes</label>
                 </div>
+                <div class="column">
+                    <label>Close Button</label>
+                    <label class="inline"><input type="radio" name="closeButton" name="closeButton" value="0" checked> No</label>
+                    <label class="inline"><input type="radio" name="closeButton" name="closeButton" value="1"> Yes</label>
+                </div>
+                <div class="column">
+                    <label>Close on Click</label>
+                    <label class="inline"><input type="radio" name="closeOnClick" name="closeOnClick" value="0"> No</label>
+                    <label class="inline"><input type="radio" name="closeOnClick" name="closeOnClick" value="1" checked> Yes</label>
+                </div>
             </div>
             <div class="row">
                 <div class="column">
@@ -332,6 +342,8 @@
             duration: parseInt(form.duration.value),
             fadeout: parseInt(form.fadeout.value),
             sticky: parseInt(form.sticky.value),
+            closeOnClick: parseInt(form.closeOnClick.value),
+            closeButton: parseInt(form.closeButton.value),
         };
         SimpleNotification[form.type.value](form.title.value, form.text.value, form.image.value, options);
     });

@@ -45,7 +45,11 @@ There is a few options that you can set by using ``SimpleNotification.options(ob
 | duration | The time that the notification is displayed. |
 | fadeout | The duration of the fadeout animation when the notification display time is over. |
 | position | Valid positions: ``top-left``, ``top-right``, ``bottom-left`` and ``bottom-right``. |
-| sticky | If set to true, the notification will not disappear until the user click it. |
+| sticky | If set to true, the notification will not disappear until the user click it or it's close button. |
+| closeButton | If set to true, a close button will be added, on the title or on the content. |
+| closeOnClick | If set to true, clicking anywhere in the notificaton will close it. |
+
+> If a notification is ``sticky`` and ``closeOnClick`` is disabled, ``closeButton`` is set to true to always have a way to close a notification.
 
 ## Text Tag
 

@@ -84,13 +84,14 @@
     border-radius: 3px;
     overflow: hidden;
     margin: 1rem;
-    cursor: pointer;
+    cursor: default;
     animation-duration: 1000ms;
     animation-timing-function: cubic-bezier(0.165, 0.84, 0.44, 1);
     animation-fill-mode: forwards;
     pointer-events: all;
     min-width: 10rem;
     max-width: 25rem;
+    position: relative;
 }
 
 .gn-insert {
@@ -109,11 +110,45 @@
     animation-name: insert-right;
 }
 
+.gn-close-on-click {
+    cursor: pointer;
+}
+.gn-close {
+    position: absolute;
+    top: 0;
+    right: 0;
+    font-size: 1rem;
+    padding: 0.5rem;
+    border-left: 1px solid rgba(0, 0, 0, 0.4);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.4);
+    border-bottom-left-radius: 3px;
+    background: rgba(0, 0, 0, 0.2);
+    opacity: 0;
+    transition: all 100ms ease-in;
+    cursor: pointer;
+    user-select: none;
+    -moz-user-select: none;
+}
+.gn-notification:hover .gn-close {
+    opacity: 1;
+}
+.gn-close:hover {
+    background: rgba(0, 0, 0, 0.6);
+}
+.gn-close.gn-close-title {
+    display: flex;
+    align-items: center;
+    bottom: 0;
+    border-bottom: 0;
+    border-bottom-left-radius: 0;
+}
+
 .gn-notification h1 {
     background-color: rgba(0, 0, 0, 0.2);
     border-bottom: 1px solid rgba(0, 0, 0, 0.4);
     overflow: hidden;
     text-overflow: ellipsis;
+    position: relative;
 }
 
 .gn-fadeout {

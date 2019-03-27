@@ -43,7 +43,7 @@ class SimpleNotification {
 
     /**
      * Transform a text with tags to a DOM Tree
-     * {open}content{close} {open}{'|'|}title{'|'|}:{'|'|}content{'|'|}{close}
+     * {open}content{close} {open}{!|title:}content{close}
      * @param {object} notificationText The node where the text will be added
      * @param {string} text The text with tags
      */
@@ -137,7 +137,7 @@ class SimpleNotification {
 
     /**
      * Add the class 'gn-extinguish' to the event target
-     * Used in create() and destroy() to be able to remove the eventListener.
+     * Used in create() and startFadeout() to be able to remove the eventListener.
      * @param {object} event The fired event
      */
     static addExtinguish(event) {
@@ -146,7 +146,7 @@ class SimpleNotification {
 
     /**
      * Remove the class 'gn-extinguish' to the event target
-     * Used in create() and destroy() to be able to remove the eventListener.
+     * Used in create() and startFadeout() to be able to remove the eventListener.
      * @param {object} event The fired event
      */
     static removeExtinguish(event) {
@@ -163,39 +163,60 @@ class SimpleNotification {
      * @param {object} options The options of the notifications
      */
     static create(classes, title=undefined, text=undefined, image=undefined, notificationOptions={}) {
-        let hasImage = (image != undefined && image != '');
-        let hasText = (text != undefined && text != '');
-        let hasTitle = (title != undefined && title != '');
+        let hasImage = (image != undefined && image != ''),
+            hasText = (text != undefined && text != ''),
+            hasTitle = (title != undefined && title != '');
         // Abort if empty
         if (!hasImage && !hasTitle && !hasText) return;
         // Merge options
         let options = Object.assign({}, SimpleNotification.default, notificationOptions);
+        // If there is nothing to close a notification we force the close button
+        options.closeButton = (!options.closeOnClick && options.sticky) ? true : options.closeButton;
         // Create wrapper if needed
-        if (SimpleNotification.wrappers[options.position] == undefined) {
+        if (!(options.position in SimpleNotification.wrappers)) {
             SimpleNotification.makeWrapper(options.position);
         }
         // Create the notification
         let fragment = document.createDocumentFragment();
         let notification = document.createElement('div');
-        // Events
-        // Delete the notification on click
-        notification.addEventListener('click', SimpleNotification.destroy.bind(null, notification, 0));
-        // Pause on hover if not sticky
-        if (!options.sticky) {
-            notification.addEventListener('mouseenter', SimpleNotification.removeExtinguish);
-            notification.addEventListener('mouseleave', SimpleNotification.addExtinguish);
-        }
         // Apply Style
         notification.className = 'gn-notification gn-insert';
         classes.forEach(element => {
             notification.classList.add(element);
         });
+        // Events
+        // Delete the notification on click
+        if (options.closeOnClick) {
+            notification.classList.add('gn-close-on-click');
+            notification.addEventListener('click', () => {
+                notification.remove();
+            });
+        }
+        // Pause on hover if not sticky
+        if (!options.sticky) {
+            notification.addEventListener('mouseenter', SimpleNotification.removeExtinguish);
+            notification.addEventListener('mouseleave', SimpleNotification.addExtinguish);
+        }
         // Add elements
         if (hasTitle) {
             let notificationTitle = document.createElement('h1');
             notificationTitle.title = title;
             notificationTitle.textContent = title;
             notification.appendChild(notificationTitle);
+        }
+        if (options.closeButton) {
+            let closeButton = document.createElement('span');
+            closeButton.className = 'gn-close';
+            closeButton.textContent = '\u274C';
+            closeButton.addEventListener('click', () => {
+                notification.remove();
+            });
+            if (hasTitle) {
+                closeButton.classList.add("gn-close-title");
+                notification.firstElementChild.appendChild(closeButton);
+            } else {
+                notification.insertBefore(closeButton, notification.firstChild);
+            }
         }
         if (hasImage || hasText) {
             let notificationContent = document.createElement('div');
@@ -213,36 +234,44 @@ class SimpleNotification {
             notification.appendChild(notificationContent);
         }
         // Add progress bar if not sticky
-        let notificationLife;
-        if (options.sticky == false) {
-            notificationLife = document.createElement('span');
+        if (!options.sticky) {
+            let notificationLife = document.createElement('span');
             notificationLife.className = 'gn-lifespan';
+            // Destroy the notification when the animation end
+            let startFadeoutAfterShorten = event => {
+                if (event.animationName == 'shorten') {
+                    SimpleNotification.startFadeout(notification, options.fadeout);
+                    notificationLife.removeEventListener('animationend', startFadeoutAfterShorten);
+                }
+            };
+            notificationLife.addEventListener('animationend', startFadeoutAfterShorten);
             // Put the extinguish in a event listener to start when insert animation is done
             let startOnInsertFinish = event => {
                 if (event.animationName == 'insert-left' || event.animationName == 'insert-right') {
                     // Set the time before removing the notification
-                    notificationLife.style.animationDuration = options.duration + 'ms';
+                    notificationLife.style.animationDuration = [options.duration, 'ms'].join('');
                     if (document.hasFocus()) {
                         notificationLife.classList.add('gn-extinguish');
                     } else {
+                        // Start the extinguish animation only when the page is focused
                         let addFocusExtinguish = () => {
                             notificationLife.classList.add('gn-extinguish');
                             document.removeEventListener('focus', addFocusExtinguish);
                         };
                         document.addEventListener('focus', addFocusExtinguish);
                     }
-                    // Destroy the notification when the animation end
-                    notificationLife.addEventListener('animationend', event => {
-                        if (event.animationName == 'shorten') {
-                            SimpleNotification.destroy(notification, options.fadeout);
-                        }
-                    });
-                    // Remove event and style
+                    // Remove event and style of insert
                     notification.classList.remove('gn-insert');
                     notification.removeEventListener('animationend', startOnInsertFinish);
                 }
             };
             notification.addEventListener('animationend', startOnInsertFinish);
+            // When fadeout end, remove the node from the wrapper
+            notification.addEventListener('animationend', event => {
+                if (event.animationName == 'fadeout') {
+                    notification.remove();
+                }
+            });
             notification.appendChild(notificationLife);
         }
         // Display
@@ -251,27 +280,16 @@ class SimpleNotification {
     }
 
     /**
-     * Add a tag for the treeFromText function
-     * @param {string} name The name of the tag
-     * @param {object} object The values of the tag
-     */
-    static addTag(name, object) {
-        SimpleNotification.tags[name] = object;
-    }
-
-    /**
-     * Remove a notification from the screen
+     * Remove reset events and add the fadeout animation
      * @param {object} notification The notification to remove
+     * @param {integer} fadeoutTime The duration of the fadeout animation
      */
-    static destroy(notification, fadeout) {
-        if (fadeout == 0) {
-            notification.parentElement.removeChild(notification);
-        }
+    static startFadeout(notification, fadeoutTime) {
         // Remove the timer animation
         notification.removeEventListener('mouseenter', SimpleNotification.removeExtinguish);
         notification.removeEventListener('mouseleave', SimpleNotification.addExtinguish);
         // Add the fadeout animation
-        notification.style.animationDuration = fadeout + 'ms';
+        notification.style.animationDuration = [fadeoutTime, 'ms'].join('');
         notification.classList.add('gn-fadeout');
         // Pause and reset fadeout on hover
         notification.addEventListener('mouseenter', event => {
@@ -279,12 +297,6 @@ class SimpleNotification {
         });
         notification.addEventListener('mouseleave', event => {
             event.target.classList.add('gn-fadeout');
-        });
-        // When fadeout end, remove the node from the wrapper
-        notification.addEventListener('animationend', event => {
-            if (event.animationName == 'fadeout') {
-                notification.parentElement.removeChild(notification);
-            }
         });
     }
 
@@ -354,10 +366,21 @@ class SimpleNotification {
     static custom(classes, title=undefined, text=undefined, image=undefined, options = {}) {
         return SimpleNotification.create(classes, title, text, image, options);
     }
+
+    /**
+     * Add a tag for the treeFromText function
+     * @param {string} name The name of the tag
+     * @param {object} object The values of the tag
+     */
+    static addTag(name, object) {
+        SimpleNotification.tags[name] = object;
+    }
 }
 SimpleNotification.wrappers = {};
 SimpleNotification.default = {
     position: 'top-right',
+    closeOnClick: true,
+    closeButton: true,
     duration: 4000,
     fadeout: 750,
     sticky: false,
