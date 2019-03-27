@@ -29,7 +29,7 @@ Each functions have the same parameters:
 | text | The content of the notification. |
 | options | The parameters for this notification. |
 
-> All parameters are optionnal, but at least one is required.
+> All parameters are optional, but at least one is required.
 
 You can use custom classes and make your own design by using ``SimpleNotification.custom(classes, title, text, options)`` where classes is an array of CSS classes that will be added to the body of each notifications.
 

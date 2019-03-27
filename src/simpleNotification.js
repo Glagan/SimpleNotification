@@ -14,8 +14,8 @@ class SimpleNotification {
      */
     static makeWrapper(position) {
         let fragment = document.createDocumentFragment();
-        let wrapper = document.createElement("div");
-        wrapper.className = "gn-wrapper gn-" + position;
+        let wrapper = document.createElement('div');
+        wrapper.className = 'gn-wrapper gn-' + position;
         fragment.appendChild(wrapper);
         document.body.appendChild(fragment);
         SimpleNotification.wrappers[position] = wrapper;
@@ -43,7 +43,7 @@ class SimpleNotification {
 
     /**
      * Transform a text with tags to a DOM Tree
-     * {open}content{close} {open}{"|'|}title{"|'|}:{"|'|}content{"|'|}{close}
+     * {open}content{close} {open}{'|'|}title{'|'|}:{'|'|}content{'|'|}{close}
      * @param {object} notificationText The node where the text will be added
      * @param {string} text The text with tags
      */
@@ -69,7 +69,7 @@ class SimpleNotification {
                         content: text.substring(foundOpenPos, foundClosePos)
                     };
                     // Search for title if tag can have one
-                    if ("title" in tag && tag.title && foundResult.content.length > 0) {
+                    if ('title' in tag && tag.title && foundResult.content.length > 0) {
                         if (foundResult.content[0] == '!') {
                             foundResult.content = foundResult.content.substring(1);
                         } else {
@@ -136,35 +136,38 @@ class SimpleNotification {
     }
 
     /**
-     * Add the class "gn-extinguish" to the event target
+     * Add the class 'gn-extinguish' to the event target
      * Used in create() and destroy() to be able to remove the eventListener.
      * @param {object} event The fired event
      */
     static addExtinguish(event) {
-        event.target.lastElementChild.classList.add("gn-extinguish");
+        event.target.lastElementChild.classList.add('gn-extinguish');
     }
 
     /**
-     * Remove the class "gn-extinguish" to the event target
+     * Remove the class 'gn-extinguish' to the event target
      * Used in create() and destroy() to be able to remove the eventListener.
      * @param {object} event The fired event
      */
     static removeExtinguish(event) {
-        event.target.lastElementChild.classList.remove("gn-extinguish");
+        event.target.lastElementChild.classList.remove('gn-extinguish');
     }
 
     /**
      * Create and append a notification
      * Options: duration, fadeout, position, image
      * @param {array} classes Array of classes to add to the notification
-     * @param {string} text The title inside the notification
+     * @param {string} title The title inside the notification
      * @param {string} text The text inside the notification
+     * @param {string} image Image to be displayed in the notification
      * @param {object} options The options of the notifications
      */
-    static create(classes, title, text, notificationOptions) {
+    static create(classes, title=undefined, text=undefined, image=undefined, notificationOptions={}) {
+        let hasImage = (image != undefined && image != '');
+        let hasText = (text != undefined && text != '');
+        let hasTitle = (title != undefined && title != '');
         // Abort if empty
-        if ((title == undefined || title == "") && (text == undefined || text == ""))
-            return;
+        if (!hasImage && !hasTitle && !hasText) return;
         // Merge options
         let options = Object.assign({}, SimpleNotification.default, notificationOptions);
         // Create wrapper if needed
@@ -173,39 +176,37 @@ class SimpleNotification {
         }
         // Create the notification
         let fragment = document.createDocumentFragment();
-        let notification = document.createElement("div");
+        let notification = document.createElement('div');
         // Events
         // Delete the notification on click
-        notification.addEventListener("click", SimpleNotification.destroy.bind(null, notification, 0));
+        notification.addEventListener('click', SimpleNotification.destroy.bind(null, notification, 0));
         // Pause on hover if not sticky
         if (!options.sticky) {
-            notification.addEventListener("mouseenter", SimpleNotification.removeExtinguish);
-            notification.addEventListener("mouseleave", SimpleNotification.addExtinguish);
+            notification.addEventListener('mouseenter', SimpleNotification.removeExtinguish);
+            notification.addEventListener('mouseleave', SimpleNotification.addExtinguish);
         }
         // Apply Style
-        notification.className = "gn-notification gn-insert";
+        notification.className = 'gn-notification gn-insert';
         classes.forEach(element => {
             notification.classList.add(element);
         });
         // Add elements
-        if (title != undefined && title != "") {
-            let notificationTitle = document.createElement("h1");
+        if (hasTitle) {
+            let notificationTitle = document.createElement('h1');
             notificationTitle.title = title;
             notificationTitle.textContent = title;
             notification.appendChild(notificationTitle);
         }
-        let hasImage = options.image != undefined && options.image != "";
-        let hasText = text != undefined && text != "";
         if (hasImage || hasText) {
-            let notificationContent = document.createElement("div");
-            notificationContent.className = "gn-content";
+            let notificationContent = document.createElement('div');
+            notificationContent.className = 'gn-content';
             if (hasImage) {
-                let notificationImage = document.createElement("img");
-                notificationImage.src = options.image;
+                let notificationImage = document.createElement('img');
+                notificationImage.src = image;
                 notificationContent.appendChild(notificationImage);
             }
             if (hasText) {
-                let notificationText = document.createElement("p");
+                let notificationText = document.createElement('p');
                 SimpleNotification.treeFromText(notificationText, text);
                 notificationContent.appendChild(notificationText);
             }
@@ -213,35 +214,35 @@ class SimpleNotification {
         }
         // Add progress bar if not sticky
         let notificationLife;
-        if (!("sticky" in options) || options.sticky == false) {
-            notificationLife = document.createElement("span");
-            notificationLife.className = "gn-lifespan";
+        if (options.sticky == false) {
+            notificationLife = document.createElement('span');
+            notificationLife.className = 'gn-lifespan';
             // Put the extinguish in a event listener to start when insert animation is done
             let startOnInsertFinish = event => {
-                if (event.animationName == "insert-left" || event.animationName == "insert-right") {
+                if (event.animationName == 'insert-left' || event.animationName == 'insert-right') {
                     // Set the time before removing the notification
-                    notificationLife.style.animationDuration = options.duration + "ms";
+                    notificationLife.style.animationDuration = options.duration + 'ms';
                     if (document.hasFocus()) {
-                        notificationLife.classList.add("gn-extinguish");
+                        notificationLife.classList.add('gn-extinguish');
                     } else {
                         let addFocusExtinguish = () => {
-                            notificationLife.classList.add("gn-extinguish");
-                            document.removeEventListener("focus", addFocusExtinguish);
+                            notificationLife.classList.add('gn-extinguish');
+                            document.removeEventListener('focus', addFocusExtinguish);
                         };
-                        document.addEventListener("focus", addFocusExtinguish);
+                        document.addEventListener('focus', addFocusExtinguish);
                     }
                     // Destroy the notification when the animation end
-                    notificationLife.addEventListener("animationend", event => {
-                        if (event.animationName == "shorten") {
+                    notificationLife.addEventListener('animationend', event => {
+                        if (event.animationName == 'shorten') {
                             SimpleNotification.destroy(notification, options.fadeout);
                         }
                     });
                     // Remove event and style
-                    notification.classList.remove("gn-insert");
-                    notification.removeEventListener("animationend", startOnInsertFinish);
+                    notification.classList.remove('gn-insert');
+                    notification.removeEventListener('animationend', startOnInsertFinish);
                 }
             };
-            notification.addEventListener("animationend", startOnInsertFinish);
+            notification.addEventListener('animationend', startOnInsertFinish);
             notification.appendChild(notificationLife);
         }
         // Display
@@ -267,74 +268,79 @@ class SimpleNotification {
             notification.parentElement.removeChild(notification);
         }
         // Remove the timer animation
-        notification.removeEventListener("mouseenter", SimpleNotification.removeExtinguish);
-        notification.removeEventListener("mouseleave", SimpleNotification.addExtinguish);
+        notification.removeEventListener('mouseenter', SimpleNotification.removeExtinguish);
+        notification.removeEventListener('mouseleave', SimpleNotification.addExtinguish);
         // Add the fadeout animation
-        notification.style.animationDuration = fadeout + "ms";
-        notification.classList.add("gn-fadeout");
+        notification.style.animationDuration = fadeout + 'ms';
+        notification.classList.add('gn-fadeout');
         // Pause and reset fadeout on hover
-        notification.addEventListener("mouseenter", event => {
-            event.target.classList.remove("gn-fadeout");
+        notification.addEventListener('mouseenter', event => {
+            event.target.classList.remove('gn-fadeout');
         });
-        notification.addEventListener("mouseleave", event => {
-            event.target.classList.add("gn-fadeout");
+        notification.addEventListener('mouseleave', event => {
+            event.target.classList.add('gn-fadeout');
         });
         // When fadeout end, remove the node from the wrapper
-        notification.addEventListener("animationend", event => {
-            if (event.animationName == "fadeout") {
+        notification.addEventListener('animationend', event => {
+            if (event.animationName == 'fadeout') {
                 notification.parentElement.removeChild(notification);
             }
         });
     }
 
     /**
-     * Create a notification with the "success" style
+     * Create a notification with the 'success' style
      * @param {string} title Title of the notification
      * @param {string} text Content of the notification
+     * @param {string} image Image to be displayed in the notification
      * @param {object} options Options used for the notification
      */
-    static success(title, text, options = {}) {
-        return SimpleNotification.create(["gn-success"], title, text, options);
+    static success(title=undefined, text=undefined, image=undefined, options = {}) {
+        return SimpleNotification.create(['gn-success'], title, text, image, options);
     }
 
     /**
-     * Create a notification with the "info" style
+     * Create a notification with the 'info' style
      * @param {string} title Title of the notification
      * @param {string} text Content of the notification
+     * @param {string} image Image to be displayed in the notification
      * @param {object} options Options used for the notification
      */
-    static info(title, text, options = {}) {
-        return SimpleNotification.create(["gn-info"], title, text, options);
+    static info(title=undefined, text=undefined, image=undefined, options = {}) {
+        return SimpleNotification.create(['gn-info'], title, text, image, options);
     }
 
     /**
-     * Create a notification with the "error" style
+     * Create a notification with the 'error' style
      * @param {string} title Title of the notification
      * @param {string} text Content of the notification
+     * @param {string} image Image to be displayed in the notification
      * @param {object} options Options used for the notification
      */
-    static error(title, text, options = {}) {
-        return SimpleNotification.create(["gn-error"], title, text, options);
+    static error(title=undefined, text=undefined, image=undefined, options = {}) {
+        return SimpleNotification.create(['gn-error'], title, text, image, options);
     }
 
     /**
-     * Create a notification with the "warning" style
+     * Create a notification with the 'warning' style
      * @param {string} title Title of the notification
      * @param {string} text Content of the notification
+     * @param {string} image Image to be displayed in the notification
      * @param {object} options Options used for the notification
      */
-    static warning(title, text, options = {}) {
-        return SimpleNotification.create(["gn-warning"], title, text, options);
+    static warning(title=undefined, text=undefined, image=undefined, options = {}) {
+        return SimpleNotification.create(['gn-warning'], title, text, image, options);
     }
 
     /**
-     * Create a notification with the "message" style
+     * Create a notification with the 'message' style
      * @param {string} title Title of the notification
      * @param {string} text Content of the notification
+     * @param {string} image Image to be displayed in the notification
      * @param {object} options Options used for the notification
      */
-    static message(title, text, options = {}) {
-        return SimpleNotification.create(["gn-message"], title, text, options);
+    static message(title=undefined, text=undefined, image=undefined, options = {}) {
+        return SimpleNotification.create(['gn-message'], title, text, image, options);
     }
 
     /**
@@ -342,16 +348,16 @@ class SimpleNotification {
      * @param {array} classes The classes of the notification
      * @param {string} title Title of the notification
      * @param {string} text Content of the notification
+     * @param {string} image Image to be displayed in the notification
      * @param {object} options Options used for the notification
      */
-    static custom(classes, title, text, options) {
-        return SimpleNotification.create(classes, title, text, options);
+    static custom(classes, title=undefined, text=undefined, image=undefined, options = {}) {
+        return SimpleNotification.create(classes, title, text, image, options);
     }
 }
 SimpleNotification.wrappers = {};
 SimpleNotification.default = {
-    image: undefined,
-    position: "top-right",
+    position: 'top-right',
     duration: 4000,
     fadeout: 750,
     sticky: false,
@@ -367,7 +373,7 @@ SimpleNotification.tags = {
         type: 'h3',
         class: 'gn-header',
         open: '## ',
-        close: "\n"
+        close: '\n'
     },
     header2: {
         type: 'h2',

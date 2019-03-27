@@ -135,7 +135,7 @@
 .gn-content img {
     max-width: 40%;
     max-height: 20rem;
-    flex-shrink: 0;
+    flex-shrink: 1;
 }
 .gn-content p {
     max-width: 100%;

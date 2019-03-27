@@ -273,7 +273,7 @@
                     <input type="number" name="fadeout" id="fadeout" value="750" placeholder="Fadeout (ms)" />
                 </div>
             </div>
-            <p class="alert alert-info"><b>Title</b>, <b>Image</b> and <b>Content</b> are all optionnal, but at least one must be specified.</p>
+            <p class="alert alert-info"><b>Title</b>, <b>Image</b> and <b>Content</b> are all optional, but at least one must be specified.</p>
             <div class="row">
                 <div class="column">
                     <label for="title">Title</label>
@@ -316,9 +316,9 @@
     document.querySelectorAll("[data-position]").forEach(button => {
         button.addEventListener("click", event => {
             if (event.target.dataset.type == 'custom') {
-                SimpleNotification.custom(["gn-custom"], "Title", texts[currentText], {position: event.target.dataset.position});
+                SimpleNotification.custom(["gn-custom"], "Title", texts[currentText], undefined, {position: event.target.dataset.position});
             } else {
-                SimpleNotification[event.target.dataset.type]("Title", texts[currentText], {position: event.target.dataset.position});
+                SimpleNotification[event.target.dataset.type]("Title", texts[currentText], undefined, {position: event.target.dataset.position});
             }
             currentText = (currentText+1)%maxText;
         });
@@ -332,9 +332,8 @@
             duration: parseInt(form.duration.value),
             fadeout: parseInt(form.fadeout.value),
             sticky: parseInt(form.sticky.value),
-            image: form.image.value
         };
-        SimpleNotification[form.type.value](form.title.value, form.text.value, options);
+        SimpleNotification[form.type.value](form.title.value, form.text.value, form.image.value, options);
     });
     </script>
 </body>
