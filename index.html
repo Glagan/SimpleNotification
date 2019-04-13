@@ -5,182 +5,61 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Glagan/SimpleNotification</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.4/css/bulma.min.css">
     <link rel="stylesheet" type="text/css" media="screen" href="src/simpleNotification.css" />
     <style>
-        :root {
-            --background-1: rgb(33, 37, 43);
-            --background-2: rgb(40, 44, 52);
-            --background-main: rgb(56, 62, 74);
-            --border: rgb(76, 81, 92);
-        }
         * {
             margin: 0;
             padding: 0;
         }
+
+        html, body {
+            min-height: 100vh;
+            background-color: #252F38;
+            overflow-x: hidden;
+            overflow-y: auto;
+        }
+
         body {
-            background: linear-gradient(var(--background-1), var(--background-2));
-            margin: 0;
-            padding: 0;
-            font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+            color: white;
+            text-shadow: 0 1px 1px black;
+        }
+        body .title {
             color: white;
         }
 
-        main {
-            min-height: 100vh;
-            width: 60%;
-            margin-left: auto;
-            margin-right: auto;
-            background-color: var(--background-main);
-            border-left: 1px solid var(--border);
-            border-right: 1px solid var(--border);
-            box-shadow: 0 0 4px var(--border);
-        }
-        @media (max-width: 992px) {
-            main {
-                width: 100%;
-            }
-        }
-        main h1,
-        main h2 {
-            padding: 0.75rem;
-            border-bottom: 1px solid var(--border);
-        }
-        main > * {
-            padding: 0.5rem;
-        }
-        main > h1 > a {
-            color: rgba(255, 255, 255, 0.8);
-            text-decoration: none;
-        }
-        main > h1 > a:hover {
-            text-decoration: underline;
+        a:hover {
+            color: white;
         }
 
-        .columns-container {
+        .corner-4, .custom {
+            border-radius: 4px;
+            border: 2px solid #4F6372;
+            background-color: #3E4E5B;
+        }
+
+        .corner-4 {
             display: flex;
             flex-wrap: wrap;
             justify-content: space-between;
-            border: 1px solid black;
-            border-radius: 4px;
-            margin: 0 1rem;
-            background-color: rgba(158, 158, 158, 0.4);
+            margin-bottom: 0.75rem;
         }
 
-        .columns-container > div {
+        .corner-4 > div {
             max-width: 50%;
             flex: 0 0 50%;
         }
 
-        .bottom-row {
-            margin-top: 50px;
+        .columns {
+            margin-top: 0;
         }
 
-        .text-right {
-            text-align: right;
-        }
-
-        /* Buttons */
-        .btn {
-            border: 0;
-            padding: 0.4rem;
-            margin: 0.2rem;
-            border-radius: 4px;
-            cursor: pointer;
+        .label {
             color: white;
         }
-        .btn-success {
-            background-color: #689f38;
-            box-shadow: 1px 1px 3px #689f38;
-        }
-        .btn-info {
-            background-color: #0288d1;
-            box-shadow: 1px 1px 3px #0288d1;
-        }
-        .btn-error {
-            background-color: #e53935;
-            box-shadow: 1px 1px 3px #e53935;
-        }
-        .btn-warning {
-            background-color: #ff8f00;
-            box-shadow: 1px 1px 3px #ff8f00;
-        }
-        .btn-message {
-            background-color: #333333;
-            box-shadow: 1px 1px 3px #333333;
-        }
-        .btn-custom {
-            color: black;
-        }
-        .btn-submit {
-            font-size: 1.5rem;
-            margin-left: auto;
-        }
 
-        /* Form */
-        .form {
-            display: flex;
-            flex-wrap: wrap;
-        }
-        .form label {
-            display: block;
-            font-size: 1.1rem;
-        }
-        .form input,
-        .form select,
-        .form textarea {
-            padding: 0.25rem;
-            border-radius: 0.25rem;
-            border: 1px solid var(--border);
-            font-family:'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
-        }
-        .form textarea {
-            max-width: 100%;
-            resize: vertical;
-        }
-        .form .long {
-            width: calc(100% - 0.5rem);
-        }
-        .form input::placeholder,
-        .form textarea::placeholder {
-            font-size: 1rem;
-            font-style: italic;
-        }
-        .row {
-            width: 100%;
-            margin-bottom: 1rem;
-            display: flex;
-            flex-flow: row nowrap;
-            justify-content: stretch;
-        }
-        .row-submit {
-            text-align: center;
-        }
-        .column {
-            flex: 1;
-            margin-right: 1rem;
-        }
-        .column:last-child {
-            margin-right: 0;
-        }
-        label.inline {
-            display: inline;
-        }
-
-        /* Alert */
-        .alert {
-            width: 100%;
-            border-radius: 0.25rem;
-            margin-bottom: 1rem;
-        }
-        .alert-info {
-            border: 2px solid #016499;
-            padding: 0.5rem;
-            padding-left: 2.2rem;
-            background-position: center left;
-            background-repeat: no-repeat;
-            background-color: #0288d1;
-            background-image: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/PjwhRE9DVFlQRSBzdmcgIFBVQkxJQyAnLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4nICAnaHR0cDovL3d3dy53My5vcmcvR3JhcGhpY3MvU1ZHLzEuMS9EVEQvc3ZnMTEuZHRkJz48c3ZnIGhlaWdodD0iNTEycHgiIGlkPSJMYXllcl8xIiBzdHlsZT0iZW5hYmxlLWJhY2tncm91bmQ6bmV3IDAgMCA1MTIgNTEyIiBmaWxsPSJ3aGl0ZSIgdmVyc2lvbj0iMS4xIiB2aWV3Qm94PSIwIDAgNTEyIDUxMiIgd2lkdGg9IjUxMnB4IiB4bWw6c3BhY2U9InByZXNlcnZlIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIj48Zz48cGF0aCBkPSJNNDgwLDI1M0M0NzguMywxMjkuMywzNzYuNywzMC40LDI1MywzMlMzMC40LDEzNS4zLDMyLDI1OWMxLjcsMTIzLjcsMTAzLjMsMjIyLjYsMjI3LDIyMUMzODIuNyw0NzguMyw0ODEuNywzNzYuNyw0ODAsMjUzICAgeiBNMjU2LDExMS45YzE3LjcsMCwzMiwxNC4zLDMyLDMycy0xNC4zLDMyLTMyLDMyYy0xNy43LDAtMzItMTQuMy0zMi0zMlMyMzguMywxMTEuOSwyNTYsMTExLjl6IE0zMDAsMzk1aC04OHYtMTFoMjJWMjI0aC0yMnYtMTIgICBoNjZ2MTcyaDIyVjM5NXoiLz48L2c+PC9zdmc+);
-            background-size: 2rem;
+        .message {
+            text-shadow: none;
         }
 
         /* Custom */
@@ -197,114 +76,147 @@
     </style>
 </head>
 <body>
-    <main>
-        <h1>Glagan/SimpleNotification (<a href="https://github.com/Glagan/SimpleNotification">Github</a>)</h1>
-        <p>Click buttons to create notifications.</p>
-        <div class="columns-container">
-            <div class="">
-                <button data-position="top-left" data-type="success" class="btn btn-success">Success</button>
-                <button data-position="top-left" data-type="info" class="btn btn-info">Info</button>
-                <button data-position="top-left" data-type="error" class="btn btn-error">Error</button><br>
-                <button data-position="top-left" data-type="warning" class="btn btn-warning">Warning</button>
-                <button data-position="top-left" data-type="message" class="btn btn-message">Message</button>
-                <button data-position="top-left" data-type="custom" class="btn btn-custom">Custom</button>
+    <div class="columns is-centered">
+        <div class="column is-three-fifths">
+            <div class="columns">
+                <div class="column search">
+                    <h1 class="title is-2"><a href="https://github.com/Glagan/SimpleNotification">Glagan/SimpleNotification</a></h1>
+                </div>
             </div>
-            <div class="text-right">
-                <button data-position="top-right" data-type="success" class="btn btn-success">Success</button>
-                <button data-position="top-right" data-type="info" class="btn btn-info">Info</button>
-                <button data-position="top-right" data-type="error" class="btn btn-error">Error</button><br>
-                <button data-position="top-right" data-type="warning" class="btn btn-warning">Warning</button>
-                <button data-position="top-right" data-type="message" class="btn btn-message">Message</button>
-                <button data-position="top-right" data-type="custom" class="btn btn-custom">Custom</button>
+            <div class="columns corner-4">
+                <div class="column is-half">
+                    <button data-position="top-left" data-type="success" class="button is-success">Success</button>
+                    <button data-position="top-left" data-type="info" class="button is-info">Info</button>
+                    <button data-position="top-left" data-type="error" class="button is-danger">Error</button><br>
+                    <button data-position="top-left" data-type="warning" class="button is-warning">Warning</button>
+                    <button data-position="top-left" data-type="message" class="button is-dark">Message</button>
+                    <button data-position="top-left" data-type="custom" class="button is-custom">Custom</button>
+                </div>
+                <div class="column has-text-right is-half">
+                    <button data-position="top-right" data-type="success" class="button is-success">Success</button>
+                    <button data-position="top-right" data-type="info" class="button is-info">Info</button>
+                    <button data-position="top-right" data-type="error" class="button is-danger">Error</button><br>
+                    <button data-position="top-right" data-type="warning" class="button is-warning">Warning</button>
+                    <button data-position="top-right" data-type="message" class="button is-dark">Message</button>
+                    <button data-position="top-right" data-type="custom" class="button is-custom">Custom</button>
+                </div>
+                <div class="column is-half">
+                    <button data-position="bottom-left" data-type="success" class="button is-success">Success</button>
+                    <button data-position="bottom-left" data-type="info" class="button is-info">Info</button>
+                    <button data-position="bottom-left" data-type="error" class="button is-danger">Error</button><br>
+                    <button data-position="bottom-left" data-type="warning" class="button is-warning">Warning</button>
+                    <button data-position="bottom-left" data-type="message" class="button is-dark">Message</button>
+                    <button data-position="bottom-left" data-type="custom" class="button is-custom">Custom</button>
+                </div>
+                <div class="column has-text-right is-half">
+                    <button data-position="bottom-right" data-type="success" class="button is-success">Success</button>
+                    <button data-position="bottom-right" data-type="info" class="button is-info">Info</button>
+                    <button data-position="bottom-right" data-type="error" class="button is-danger">Error</button><br>
+                    <button data-position="bottom-right" data-type="warning" class="button is-warning">Warning</button>
+                    <button data-position="bottom-right" data-type="message" class="button is-dark">Message</button>
+                    <button data-position="bottom-right" data-type="custom" class="button is-custom">Custom</button>
+                </div>
             </div>
-            <div class="bottom-row">
-                <button data-position="bottom-left" data-type="success" class="btn btn-success">Success</button>
-                <button data-position="bottom-left" data-type="info" class="btn btn-info">Info</button>
-                <button data-position="bottom-left" data-type="error" class="btn btn-error">Error</button><br>
-                <button data-position="bottom-left" data-type="warning" class="btn btn-warning">Warning</button>
-                <button data-position="bottom-left" data-type="message" class="btn btn-message">Message</button>
-                <button data-position="bottom-left" data-type="custom" class="btn btn-custom">Custom</button>
-            </div>
-            <div class="bottom-row text-right">
-                <button data-position="bottom-right" data-type="success" class="btn btn-success">Success</button>
-                <button data-position="bottom-right" data-type="info" class="btn btn-info">Info</button>
-                <button data-position="bottom-right" data-type="error" class="btn btn-error">Error</button><br>
-                <button data-position="bottom-right" data-type="warning" class="btn btn-warning">Warning</button>
-                <button data-position="bottom-right" data-type="message" class="btn btn-message">Message</button>
-                <button data-position="bottom-right" data-type="custom" class="btn btn-custom">Custom</button>
+            <div class="columns">
+                <div class="column custom">
+                    <h2 class="title is-2">Custom Notification</h2>
+                    <p>Use this form to customize all properties of a notification.</p>
+                    <form id="custom">
+                        <div class="field is-grouped">
+                            <div class="columns is-touch">
+                                <div class="column">
+                                    <label class="label" for="type">Type</label>
+                                    <div class="select">
+                                        <select name="type" id="type">
+                                            <option value="success" selected>Success</option>
+                                            <option value="info">Information</option>
+                                            <option value="error">Error</option>
+                                            <option value="warning">Warning</option>
+                                            <option value="message">Message</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="column">
+                                    <label class="label" for="position">Position</label>
+                                    <div class="select">
+                                        <select name="position" id="position">
+                                            <option value="top-left">top-left</option>
+                                            <option value="top-right" selected>top-right (default)</option>
+                                            <option value="bottom-left">bottom-left</option>
+                                            <option value="bottom-right">bottom-right</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="column">
+                                    <label class="label">Sticky</label>
+                                    <div class="control">
+                                        <label class="radio"><input type="radio" name="sticky" name="sticky" value="0" checked> No</label>
+                                        <label class="radio"><input type="radio" name="sticky" name="sticky" value="1"> Yes</label>
+                                    </div>
+                                </div>
+                                <div class="column">
+                                    <label class="label">Close Button</label>
+                                    <div class="control">
+                                        <label class="radio"><input type="radio" name="closeButton" name="closeButton" value="0" checked> No</label>
+                                        <label class="radio"><input type="radio" name="closeButton" name="closeButton" value="1"> Yes</label>
+                                    </div>
+                                </div>
+                                <div class="column">
+                                    <label class="label">Close on Click</label>
+                                    <div class="control">
+                                        <label class="radio"><input type="radio" name="closeOnClick" name="closeOnClick" value="0"> No</label>
+                                        <label class="radio"><input type="radio" name="closeOnClick" name="closeOnClick" value="1" checked> Yes</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="field is-grouped">
+                            <div class="column">
+                                <label class="label" for="duration">Display duration (ms)</label>
+                                <div class="control">
+                                    <input class="input" type="number" name="duration" id="duration" value="4000" placeholder="Duration (ms)" />
+                                </div>
+                            </div>
+                            <div class="column">
+                                <label class="label" for="fadeout">Fadeout duration (ms)</label>
+                                <div class="control">
+                                    <input class="input" type="number" name="fadeout" id="fadeout" value="750" placeholder="Fadeout (ms)" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="message is-info">
+                            <p class="message-body"><b>Title</b>, <b>Image</b> and <b>Content</b> are all optional, but at least one must be specified.</p>
+                        </div>
+                        <div class="field is-grouped">
+                            <div class="column">
+                                <label class="label" for="title">Title</label>
+                                <div class="control">
+                                    <input class="input" type="text" name="title" id="title" class="long" value="Title" placeholder="Title" />
+                                </div>
+                            </div>
+                            <div class="column">
+                                <label class="label" for="image">Image</label>
+                                <div class="control">
+                                    <input class="input" type="text" name="image" id="image" class="long" placeholder="Image" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="field">
+                            <div class="column">
+                                <label class="label" for="text">Content</label>
+                                <div class="control">
+                                    <textarea class="textarea" name="text" id="text" class="long" value="Content" placeholder="Notification content"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="field is-pulled-right">
+                            <button type="submit" class="button is-success">Show</button>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
-        <h2>Custom Notification</h2>
-        <p>Use this form to customize all properties of a notification.</p>
-        <form id="custom" class="form">
-            <div class="row">
-                <div class="column">
-                    <label for="type">Type</label>
-                    <select name="type" id="type">
-                        <option value="success" selected>Success</option>
-                        <option value="info">Information</option>
-                        <option value="error">Error</option>
-                        <option value="warning">Warning</option>
-                        <option value="message">Message</option>
-                    </select>
-                </div>
-                <div class="column">
-                    <label for="position">Position</label>
-                    <select name="position" id="position">
-                        <option value="top-left">top-left</option>
-                        <option value="top-right" selected>top-right (default)</option>
-                        <option value="bottom-left">bottom-left</option>
-                        <option value="bottom-right">bottom-right</option>
-                    </select>
-                </div>
-                <div class="column">
-                    <label>Sticky</label>
-                    <label class="inline"><input type="radio" name="sticky" name="sticky" value="0" checked> No</label>
-                    <label class="inline"><input type="radio" name="sticky" name="sticky" value="1"> Yes</label>
-                </div>
-                <div class="column">
-                    <label>Close Button</label>
-                    <label class="inline"><input type="radio" name="closeButton" name="closeButton" value="0" checked> No</label>
-                    <label class="inline"><input type="radio" name="closeButton" name="closeButton" value="1"> Yes</label>
-                </div>
-                <div class="column">
-                    <label>Close on Click</label>
-                    <label class="inline"><input type="radio" name="closeOnClick" name="closeOnClick" value="0"> No</label>
-                    <label class="inline"><input type="radio" name="closeOnClick" name="closeOnClick" value="1" checked> Yes</label>
-                </div>
-            </div>
-            <div class="row">
-                <div class="column">
-                    <label for="duration">Display duration (ms)</label>
-                    <input type="number" name="duration" id="duration" value="4000" placeholder="Duration (ms)" />
-                </div>
-                <div class="column">
-                    <label for="fadeout">Fadeout duration (ms)</label>
-                    <input type="number" name="fadeout" id="fadeout" value="750" placeholder="Fadeout (ms)" />
-                </div>
-            </div>
-            <p class="alert alert-info"><b>Title</b>, <b>Image</b> and <b>Content</b> are all optional, but at least one must be specified.</p>
-            <div class="row">
-                <div class="column">
-                    <label for="title">Title</label>
-                    <input type="text" name="title" id="title" class="long" value="Title" placeholder="Title" />
-                </div>
-                <div class="column">
-                    <label for="image">Image</label>
-                    <input type="text" name="image" id="image" class="long" placeholder="Image" />
-                </div>
-            </div>
-            <div class="row">
-                <div class="column">
-                    <label for="text">Content</label>
-                    <textarea name="text" id="text" class="long" value="Content" placeholder="Notification content"></textarea>
-                </div>
-            </div>
-            <div class="row row-submit">
-                <button type="submit" class="btn btn-submit btn-success">Show</button>
-            </div>
-        </form>
-    </main>
+    </div>
     <script src="src/simpleNotification.js"></script>
     <script>
     // Add Tag
