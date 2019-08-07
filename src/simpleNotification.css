@@ -201,13 +201,12 @@
     align-items: center;
 }
 .gn-content > img {
-    max-width: 40%;
+    max-width: 30%;
     max-height: 20rem;
-    flex-shrink: 1;
+    flex-shrink: 0;
 }
 .gn-content .gn-text {
     max-width: 100%;
-    /*hite-space: pre-line;*/
     word-break: break-word;
 }
 .gn-content > img:only-child,
