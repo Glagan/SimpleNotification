@@ -132,9 +132,9 @@ class SimpleNotification {
                     if (content.indexOf('!') == 0) {
                         content = content.substring(1);
                     } else {
-                        // find :
-                        let foundTitleBreak = this.firstUnbreakChar(content, ':');
-                        content = content.replace('\\:', ':');
+                        // find |
+                        let foundTitleBreak = this.firstUnbreakChar(content, '|');
+                        content = content.replace('\\|', '|');
                         if (foundTitleBreak > -1) {
                             title = content.substring(0, foundTitleBreak);
                             content = content.substring(foundTitleBreak + 1);
@@ -559,7 +559,6 @@ SimpleNotification.default = {
         onClose: undefined,
     }
 };
-// TODO: Sort tags to check if they have the same start
 SimpleNotification.tags = {
     code: {
         type: 'code',
@@ -619,7 +618,7 @@ SimpleNotification.tags = {
         type: 'div',
         class: 'gn-separator',
         textContent: false,
-        open: '---\n',
+        open: '\n---\n',
         close: ''
     },
     linejump: {

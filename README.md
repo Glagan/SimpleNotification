@@ -81,10 +81,10 @@ You can insert links, or stylize text by using tags that ressemble **Markdown**.
 | Name | Description |
 |---|---|
 | Inline code | \`\`code\`\` |
-| Header (h2) | ``# Header 2\r\n`` |
-| Header (h3) | ``## Header 3\r\n`` |
-| Link | ``{{title:http://www.example.org/}}`` or ``{{!http://www.example.org/}}``|
-| Image | ``![title:http://www.example.org/image.jpg]`` or ``![!http://www.example.org/image.jpeg]``|
+| Header (h1) | ``# Header 1\n`` |
+| Header (h2) | ``## Header 2\n`` |
+| Link | ``{{title|http://www.example.org/}}`` or ``{{http://www.example.org/}}`` without title. |
+| Image | ``![title|http://www.example.org/image.jpg]`` or ``![http://www.example.org/image.jpg]`` without title. |
 | Bold | ``**http://www.example.org/**`` |
 | Italic | ``*http://www.example.org/*`` |
 | Separator | ``---\n`` |
@@ -118,11 +118,11 @@ There is 2 usable *variables* inside attributes values, textContent and title:
 
 Tags can have a *title*. It's additional data that can be used for the result.
 
-The title of a tag is found by using the first separator ``:``, you can avoid using a separator by adding a slash before ``\:``.  
-You can also avoid using title for the tag by adding **!** before the content, the following examples are the same and will display a link with the URL as it's displayed content.
-If ``title`` is not defined or set to false, it will ignore the title find step.  
+The title of a tag is found by using the first separator ``|``, you can avoid using a separator by adding a slash before ``\|``.  
+You can also avoid using title for the tag by adding **!** before the content, the following examples are the same and will display the image ``tes|.jpg``.  
+If ``title`` is not defined, set to false or not found, it will ignore the title find step.  
 
 ```
-{{!http://www.example.org/}}
-{{http\://www.example.org/}}
+![!http://www.example.org/tes|.jpg]
+![http://www.example.org/tes\|.jpg]
 ```
