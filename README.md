@@ -1,7 +1,8 @@
 # SimpleNotification
 
 *SimpleNotification* is a library to display simple yet customizable notifications.  
-You can stylize text with a simple syntax, add buttons to make the notifications interactable and add callbacks for some events during the life of a notification.
+You can stylize text with a simple syntax, add buttons to make the notifications interactable and add callbacks for some events during the life of a notification.  
+*SimpleNotification* weight **9.98 Kb** (**3.38Kb** gziped), with no dependencies.
 
 You can find a live demo here: [https://notification.nikurasu.org/](https://notification.nikurasu.org/)
 
