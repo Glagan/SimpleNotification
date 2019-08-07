@@ -240,7 +240,7 @@
     document.querySelectorAll("[data-position]").forEach(button => {
         button.addEventListener("click", event => {
             if (event.target.dataset.type == 'custom') {
-                SimpleNotification.custom(["gn-custom"], "Title", texts[currentText], undefined, {
+                SimpleNotification.custom(["gn-custom"], "Title", texts[currentText], undefined, undefined, {
                     position: event.target.dataset.position,
                     events: {
                         onCreate: () => {
@@ -254,7 +254,7 @@
                     }
                 });
             } else {
-                SimpleNotification[event.target.dataset.type]("Title", texts[currentText], undefined, {position: event.target.dataset.position});
+                SimpleNotification[event.target.dataset.type]("Title", texts[currentText], undefined, undefined, {position: event.target.dataset.position});
             }
             currentText = (currentText+1)%maxText;
         });
@@ -265,13 +265,13 @@
         let form = event.target;
         let options = {
             position: form.position.value,
-            duration: parseInt(form.duration.value),
-            fadeout: parseInt(form.fadeout.value),
-            sticky: parseInt(form.sticky.value),
-            closeOnClick: parseInt(form.closeOnClick.value),
-            closeButton: parseInt(form.closeButton.value),
+            duration: Math.floor(form.duration.value),
+            fadeout: Math.floor(form.fadeout.value),
+            sticky: Math.floor(form.sticky.value),
+            closeOnClick: Math.floor(form.closeOnClick.value),
+            closeButton: Math.floor(form.closeButton.value),
         };
-        SimpleNotification[form.type.value](form.title.value, form.text.value, form.image.value, options);
+        SimpleNotification[form.type.value](form.title.value, form.text.value, form.image.value, undefined, options);
     });
     </script>
 </body>

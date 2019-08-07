@@ -54,25 +54,33 @@ There is a few options that you can set by using ``SimpleNotification.options(ob
 
 ## Events
 
-There is 3 events during the process of every notifications:
+There is 4 events during the process of every notifications:
 
 ### onCreate
 
 Called when the notification *node* is created but **empty**.
 
-The ``SimpleNotification`` object of the target notification is passed as a parameter ``onCreate(SimpleNotification)``.
+The target notification object is passed as a parameter ``onCreate(notification)``.
 
 ### onDisplay
 
 Called after the notification is added to it's wrapper.
 
-The ``SimpleNotification`` object of the target notification is passed as a parameter ``onDisplay(SimpleNotification)``.
+The target notification object is passed as a parameter ``onDisplay(notification)``.
+
+### onDeath
+
+Called after the notification display time has passed, and before closing it.
+
+The target notification object is passed a a parameter ``onDeath(notification)``.
+
+> If you set the ``onDeath`` function you need to call ``notification.close()``, ``notification.remove()`` or ``notification.closeFadeout()`` or else the notification won't disappear.
 
 ### onClose
 
 Called after the notification is closed.
 
-The ``SimpleNotification`` object of the target notification and if the notification has been manually closed are passed as parameters ``onClose(SimpleNotification, fromUser)``.
+The target notification object and if the notification has been manually closed are passed as parameters ``onClose(notification, fromUser)``.
 
 ## Text Tag
 

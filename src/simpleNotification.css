@@ -160,14 +160,16 @@
     height: 3px;
     width: 100%;
     background-color: #4dd0e1;
-    transition-property: width;
-    transition-timing-function: linear;
+    transition: height .4s ease-in-out, width 0s linear;
 }
 .gn-extinguish {
     animation-duration: 1000ms;
     animation-name: shorten;
     animation-timing-function: linear;
     animation-fill-mode: forwards;
+}
+.gn-lifespan.gn-retire {
+    height: 0px;
 }
 
 .gn-success {
@@ -265,4 +267,34 @@
     height: 2px;
     line-height: 0px;
     margin: .75rem 0;
+}
+
+.gn-buttons {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: stretch;
+    align-items: stretch;
+    align-content: stretch;
+    text-align: center;
+    border-top: 1px solid rgba(0, 0, 0, 0.4);
+}
+.gn-button {
+    width: 100%;
+    padding: .5rem;
+    border: 0;
+    cursor: pointer;
+    border-right: 1px solid rgba(0, 0, 0, 0.4);
+    transition: all 0.1s ease-in;
+    font-size: 1rem;
+}
+.gn-button:hover {
+    background: rgba(0, 0, 0, 0.6);
+}
+.gn-button:disabled {
+    background: rgba(0, 0, 0, 0.6);
+    filter: grayscale(60%);
+}
+.gn-button:last-child {
+    border-right: 0;
 }

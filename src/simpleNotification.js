@@ -8,7 +8,11 @@ class SimpleNotification {
         this.body = undefined;
         this.image = undefined;
         this.text = undefined;
+        this.buttons = undefined;
         this.progressBar = undefined;
+        //
+        this.duration = 0;
+        this.fadeoutTime = 0;
         // Events
         this.events = {};
         Object.keys(events).forEach(key => {
@@ -223,9 +227,26 @@ class SimpleNotification {
         classes.forEach(className => {
             this.node.classList.add(className);
         });
+        // When fadeout end, remove the node from the wrapper
+        this.node.addEventListener('animationend', event => {
+            if (event.animationName == 'fadeout') {
+                this.close(false);
+            } else if (event.animationName == 'insert-left' ||
+                event.animationName == 'insert-right') {
+                this.node.classList.remove('gn-insert');
+            }
+        });
         if (this.events.onCreate) {
             this.events.onCreate(this);
         }
+    }
+
+    setDuration(tm) {
+        this.duration = tm;
+    }
+
+    setFadeoutTime(tm) {
+        this.fadeoutTime = tm;
     }
 
     setWrapper(wrapper) {
@@ -301,14 +322,35 @@ class SimpleNotification {
         SimpleNotification.textToNode(content, this.text);
     }
 
-    addProgressBar(duration, fadeoutTime) {
+    addButton(type, value, onClick) {
+        if (this.buttons == undefined) {
+            this.buttons = document.createElement('div');
+            this.buttons.className = 'gn-buttons';
+            this.node.appendChild(this.buttons);
+        }
+        let button = document.createElement('button');
+        SimpleNotification.textToNode(value, button);
+        button.className = ['gn-button gn-', type].join('');
+        button.addEventListener('click', event => {
+            event.stopPropagation();
+            onClick(this);
+        });
+        this.buttons.appendChild(button);
+    }
+
+    addProgressBar() {
         this.progressBar = document.createElement('span');
         this.progressBar.className = 'gn-lifespan';
         // Destroy the notification when the animation end
         let startFadeoutAfterShorten = event => {
             if (event.animationName == 'shorten') {
-                this.startFadeout(fadeoutTime);
                 this.progressBar.removeEventListener('animationend', startFadeoutAfterShorten);
+                this.progressBar.classList.add('gn-retire');
+                if (this.events.onDeath) {
+                    this.events.onDeath(this);
+                } else {
+                    this.closeFadeout();
+                }
             }
         };
         this.progressBar.addEventListener('animationend', startFadeoutAfterShorten);
@@ -316,7 +358,7 @@ class SimpleNotification {
         let startOnInsertFinish = event => {
             if (event.animationName == 'insert-left' || event.animationName == 'insert-right') {
                 // Set the time before removing the notification
-                this.progressBar.style.animationDuration = [duration, 'ms'].join('');
+                this.progressBar.style.animationDuration = [this.duration, 'ms'].join('');
                 if (document.hasFocus()) {
                     this.progressBar.classList.add('gn-extinguish');
                 } else {
@@ -328,17 +370,10 @@ class SimpleNotification {
                     document.addEventListener('focus', addFocusExtinguish);
                 }
                 // Remove event and style of insert
-                this.node.classList.remove('gn-insert');
                 this.node.removeEventListener('animationend', startOnInsertFinish);
             }
         };
         this.node.addEventListener('animationend', startOnInsertFinish);
-        // When fadeout end, remove the node from the wrapper
-        this.node.addEventListener('animationend', event => {
-            if (event.animationName == 'fadeout') {
-                this.close(false);
-            }
-        });
         this.node.appendChild(this.progressBar);
     }
 
@@ -368,7 +403,7 @@ class SimpleNotification {
 
     /**
      * Add the class 'gn-extinguish' to the event target
-     * Used in create() and startFadeout() to be able to remove the eventListener.
+     * Used in create() and closeFadeout() to be able to remove the eventListener.
      */
     addExtinguishFct() {
         this.progressBar.classList.add('gn-extinguish');
@@ -376,7 +411,7 @@ class SimpleNotification {
 
     /**
      * Remove the class 'gn-extinguish' to the event target
-     * Used in create() and startFadeout() to be able to remove the eventListener.
+     * Used in create() and closeFadeout() to be able to remove the eventListener.
      */
     removeExtinguishFct() {
         this.progressBar.classList.remove('gn-extinguish');
@@ -384,19 +419,19 @@ class SimpleNotification {
 
     /**
      * Remove reset events and add the fadeout animation
-     * @param {object} notification The notification to remove
-     * @param {integer} fadeoutTime The duration of the fadeout animation
      */
-    startFadeout(fadeoutTime) {
+    closeFadeout() {
+        // Disable buttons
+        if (this.buttons) {
+            for (let i = 0, max = this.buttons.childNodes.length; i < max; i++) {
+                this.buttons.childNodes[i].disabled = true;
+            }
+        }
         // Remove the timer animation
-        if (this.events.onEnter)
-            this.node.removeEventListener('mouseenter', this.events.onEnter);
         this.node.removeEventListener('mouseenter', this.removeExtinguish);
-        if (this.events.onLeave)
-            this.node.removeEventListener('mouseleave', this.events.onLeave);
         this.node.removeEventListener('mouseleave', this.addExtinguish);
         // Add the fadeout animation
-        this.node.style.animationDuration = [fadeoutTime, 'ms'].join('');
+        this.node.style.animationDuration = [this.fadeoutTime, 'ms'].join('');
         this.node.classList.add('gn-fadeout');
         // Pause and reset fadeout on hover
         this.node.addEventListener('mouseenter', event => {
@@ -416,7 +451,7 @@ class SimpleNotification {
      * @param {string} image Image to be displayed in the notification
      * @param {object} options The options of the notifications
      */
-    static create(classes, title=undefined, text=undefined, image=undefined, notificationOptions={}) {
+    static create(classes, title=undefined, text=undefined, image=undefined, buttons=undefined, notificationOptions={}) {
         let hasImage = (image != undefined && image != ''),
             hasText = (text != undefined && text != ''),
             hasTitle = (title != undefined && title != '');
@@ -432,6 +467,8 @@ class SimpleNotification {
         }
         // Create the notification
         let notification = new SimpleNotification(options.events);
+        notification.setDuration(options.duration);
+        notification.setFadeoutTime(options.fadeout);
         notification.make(classes);
         notification.setWrapper(SimpleNotification.wrappers[options.position]);
         // Events
@@ -459,9 +496,17 @@ class SimpleNotification {
                 notification.setText(text);
             }
         }
+        if (buttons) {
+            if (!Array.isArray(buttons)) {
+                buttons = [ buttons ];
+            }
+            for (let i = 0, max = buttons.length; i < max; i++) {
+                notification.addButton(buttons[i].type, buttons[i].value, buttons[i].onClick);
+            }
+        }
         // Add progress bar if not sticky
         if (!options.sticky) {
-            notification.addProgressBar(options.duration, options.fadeout);
+            notification.addProgressBar();
         }
         // Display
         notification.display();
@@ -475,8 +520,8 @@ class SimpleNotification {
      * @param {string} image Image to be displayed in the notification
      * @param {object} options Options used for the notification
      */
-    static success(title=undefined, text=undefined, image=undefined, options = {}) {
-        return this.create(['gn-success'], title, text, image, options);
+    static success(title=undefined, text=undefined, image=undefined, buttons=undefined, options={}) {
+        return this.create(['gn-success'], title, text, image, buttons, options);
     }
 
     /**
@@ -486,8 +531,8 @@ class SimpleNotification {
      * @param {string} image Image to be displayed in the notification
      * @param {object} options Options used for the notification
      */
-    static info(title=undefined, text=undefined, image=undefined, options = {}) {
-        return this.create(['gn-info'], title, text, image, options);
+    static info(title=undefined, text=undefined, image=undefined, buttons=undefined, options={}) {
+        return this.create(['gn-info'], title, text, image, buttons, options);
     }
 
     /**
@@ -497,8 +542,8 @@ class SimpleNotification {
      * @param {string} image Image to be displayed in the notification
      * @param {object} options Options used for the notification
      */
-    static error(title=undefined, text=undefined, image=undefined, options = {}) {
-        return this.create(['gn-error'], title, text, image, options);
+    static error(title=undefined, text=undefined, image=undefined, buttons=undefined, options={}) {
+        return this.create(['gn-error'], title, text, image, buttons, options);
     }
 
     /**
@@ -508,8 +553,8 @@ class SimpleNotification {
      * @param {string} image Image to be displayed in the notification
      * @param {object} options Options used for the notification
      */
-    static warning(title=undefined, text=undefined, image=undefined, options = {}) {
-        return this.create(['gn-warning'], title, text, image, options);
+    static warning(title=undefined, text=undefined, image=undefined, buttons=undefined, options={}) {
+        return this.create(['gn-warning'], title, text, image, buttons, options);
     }
 
     /**
@@ -519,8 +564,8 @@ class SimpleNotification {
      * @param {string} image Image to be displayed in the notification
      * @param {object} options Options used for the notification
      */
-    static message(title=undefined, text=undefined, image=undefined, options = {}) {
-        return this.create(['gn-message'], title, text, image, options);
+    static message(title=undefined, text=undefined, image=undefined, buttons=undefined, options={}) {
+        return this.create(['gn-message'], title, text, image, buttons, options);
     }
 
     /**
@@ -531,8 +576,8 @@ class SimpleNotification {
      * @param {string} image Image to be displayed in the notification
      * @param {object} options Options used for the notification
      */
-    static custom(classes, title=undefined, text=undefined, image=undefined, options = {}) {
-        return this.create(classes, title, text, image, options);
+    static custom(classes, title=undefined, text=undefined, image=undefined, buttons=undefined, options={}) {
+        return this.create(classes, title, text, image, buttons, options);
     }
 
     /**
@@ -551,11 +596,12 @@ SimpleNotification.default = {
     closeOnClick: true,
     closeButton: true,
     duration: 4000,
-    fadeout: 750,
+    fadeout: 400,
     sticky: false,
     events: {
         onCreate: undefined,
         onDisplay: undefined,
+        onDeath: undefined,
         onClose: undefined,
     }
 };
