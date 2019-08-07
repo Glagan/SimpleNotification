@@ -1,38 +1,49 @@
 # SimpleNotification
 
-*SimpleNotification* is a library to display simple yet customizable notifications.
+*SimpleNotification* is a library to display simple yet customizable notifications.  
+You can stylize text with a simple syntax, add buttons to make the notifications interactable and add callbacks for some events during the life of a notification.
 
 You can find a live demo here: [https://notification.nikurasu.org/](https://notification.nikurasu.org/)
 
 ## Installation
 
-You simply need to include ``simpleNotification.css``, ``simpleNotification.js`` and you're ready to go !
+You simply need to include ``simpleNotification.css``, ``simpleNotification.js`` (or they minified version) and you're ready to go !
 
 ## How to use
 
-*SimpleNotification* has static methods to display notifications, and there is 5 default templates.  
-You can call each templates by their name directly on ``SimpleNotification`` without instantiating it, for example: ``SimpleNotification.succes(...)``.
+*SimpleNotification* has static methods to display notifications with 5 default templates.  
+You can call each templates by their name directly on ``SimpleNotification`` without instantiating it, for example: ``SimpleNotification.success(...)``.  
+The five templates are ``success``, ``error``, ``info``, ``warning`` and ``message``.
 
-| Name | Result |
-|---|---|
-| success | ![Success notification](screenshots/success.png) |
-| info | ![Information notification](screenshots/info.png) |
-| error | ![Error notification](screenshots/error.png) |
-| warning | ![Warning notification](screenshots/warning.png) |
-| message | ![Message notification](screenshots/message.png) |
+![Success notification](screenshots/success.png)
 
-Each functions have the same parameters:
+```javascript
+SimpleNotification.success({
+    title: 'Title', // The title of the notification
+    image: 'url', // Optionnal image displayed inside the notification
+    text: 'Content', // Content of the notification
+    // Optionnal list of buttons to interact with the notification
+    buttons: [{
+        value: 'Confirm', // The text inside the button
+        type: 'success', // The type of the button, same as for the notifications
+        onClick: (notification) => {
+            // The onClick function receive the notification from which the button has been clicked
+            // You can call notification.remove(), notification.close() or notification.closeFadeout()
+            // if you wish to remove the notification by clicking on  the buttons
+        }
+    }]
+}, options);
+```
 
-| Name | Description |
-|---|---|
-| title | The title of the notification. |
-| text | The content of the notification. |
-| image | Add an image next to the notification content. |
-| options | The parameters for this notification. |
+> All keys in the first parameter are optional, but at least one is required.
 
-> All parameters are optional, but at least one is required.
+You can still update the content and state of any notification after it's been created with these functions:
 
-You can use custom classes and make your own design by using ``SimpleNotification.custom(classes, title, text, options)`` where classes is an array of CSS classes that will be added to the body of each notifications.
+```
+setPosition(position), setType(type), setTitle(title), setImage(image), setText(text), addButton(button), removeButtons()
+```
+
+You can use custom classes and make your own design by using ``SimpleNotification.custom(classes, content, options)`` where classes is an array of CSS classes that will be added to the body of each notifications.
 
 You can jump line inside the notification content by using any linebreak character (``\r``, ``\n`` or ``\r\n``).
 
@@ -48,7 +59,8 @@ There is a few options that you can set by using ``SimpleNotification.options(ob
 | sticky | If set to true, the notification will not disappear until the user click it or it's close button. |
 | closeButton | If set to true, a close button will be added, on the title or on the content. |
 | closeOnClick | If set to true, clicking anywhere in the notificaton will close it. |
-| events | See [Events](##Events) |
+| events | Object with events functions, see [Events](##Events) |
+| display | Display the notification when creating it (default to **true**). |
 
 > If a notification is ``sticky`` and ``closeOnClick`` is disabled, ``closeButton`` is set to true to always have a way to close a notification.
 
@@ -56,35 +68,16 @@ There is a few options that you can set by using ``SimpleNotification.options(ob
 
 There is 4 events during the process of every notifications:
 
-### onCreate
+* ``onCreate(notification)`` called when the notification *node* is created but **empty**.
+* ``onDisplay(notification)`` called when the notification *node* is appended to it's wrapper.
+* ``onDeath(notification)`` called when the duration timer has expired.  
+    * If you set the ``onDeath`` function you need to call ``notification.close()``, ``notification.remove()`` or ``notification.closeFadeout()`` or else the notification won't disappear.
+* ``onDisplay(notification)`` after the notification has been closed.
 
-Called when the notification *node* is created but **empty**.
+## Markdown *like* tags
 
-The target notification object is passed as a parameter ``onCreate(notification)``.
-
-### onDisplay
-
-Called after the notification is added to it's wrapper.
-
-The target notification object is passed as a parameter ``onDisplay(notification)``.
-
-### onDeath
-
-Called after the notification display time has passed, and before closing it.
-
-The target notification object is passed a a parameter ``onDeath(notification)``.
-
-> If you set the ``onDeath`` function you need to call ``notification.close()``, ``notification.remove()`` or ``notification.closeFadeout()`` or else the notification won't disappear.
-
-### onClose
-
-Called after the notification is closed.
-
-The target notification object and if the notification has been manually closed are passed as parameters ``onClose(notification, fromUser)``.
-
-## Text Tag
-
-You can insert links, or stylize text by using tags that ressemble **Markdown**.
+You can insert links, images and stylize text by using tags that ressemble **Markdown**.  
+Most of these tags can be nested to combine their effects.
 
 | Name | Description |
 |---|---|
@@ -95,7 +88,10 @@ You can insert links, or stylize text by using tags that ressemble **Markdown**.
 | Image | ``![title|http://www.example.org/image.jpg]`` or ``![http://www.example.org/image.jpg]`` without title. |
 | Bold | ``**http://www.example.org/**`` |
 | Italic | ``*http://www.example.org/*`` |
-| Separator | ``---\n`` |
+| Separator | ``\n---\n`` |
+
+Tags works by looking for an open token, an optional separator if there is a title and the close token.  
+If the tag can have a *title* you need to use ``|`` as the separator with the *content*.
 
 You can add custom tags easily by adding them to ``SimpleNotification.tags`` or by using ``SimpleNotification.addTag(name, object)``.  
 A tag object can have the following properties:
@@ -119,18 +115,5 @@ A tag object can have the following properties:
 
 There is 2 usable *variables* inside attributes values, textContent and title:
 
-* ``$content``: the content found between the ``open`` and ``close`` token, without title if there is one
-* ``$title``: the title found, if there is none it is replaced by the same value as ``$content``
-
-### Title
-
-Tags can have a *title*. It's additional data that can be used for the result.
-
-The title of a tag is found by using the first separator ``|``, you can avoid using a separator by adding a slash before ``\|``.  
-You can also avoid using title for the tag by adding **!** before the content, the following examples are the same and will display the image ``tes|.jpg``.  
-If ``title`` is not defined, set to false or not found, it will ignore the title find step.  
-
-```
-![!http://www.example.org/tes|.jpg]
-![http://www.example.org/tes\|.jpg]
-```
+* ``$content``: the content found between the ``open`` and ``close`` token, without the title if there is one.
+* ``$title``: the title found, if there is none it is replaced by the same value as ``$content``.

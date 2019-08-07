@@ -89,6 +89,7 @@
     min-width: 10rem;
     max-width: 25rem;
     position: relative;
+    transition: background-color .2s ease-in-out;
 }
 
 .gn-insert {
@@ -238,6 +239,8 @@
     font-size: 1.1rem;
 }
 .gn-content .gn-text img {
+    height: auto;
+    max-width: 100%;
     margin: 0.1rem 0;
 }
 .gn-bold {

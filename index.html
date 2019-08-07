@@ -68,10 +68,8 @@
         }
         .gn-custom {
             background-color: pink;
-            color: white;
-        }
-        .gn-custom p {
-            color: darkviolet;
+            color: black;
+            text-shadow: 0 1px 1px white;
         }
     </style>
 </head>
@@ -180,7 +178,7 @@
                             <div class="column">
                                 <label class="label" for="fadeout">Fadeout duration (ms)</label>
                                 <div class="control">
-                                    <input class="input" type="number" name="fadeout" id="fadeout" value="750" placeholder="Fadeout (ms)" />
+                                    <input class="input" type="number" name="fadeout" id="fadeout" value="400" placeholder="Fadeout (ms)" />
                                 </div>
                             </div>
                         </div>
@@ -226,40 +224,139 @@
         open: '__', close: '__'
     });
     // Data
-    let texts = [
-        "Content",
-        "Can be multi-line using ``\\r``, ``\\r\\n`` or ``\\n``.\nLike this.",
-        "Text can be *styled* **easily**, contain {{links|https://notification.nikurasu.org/}} and even ``code`` !",
-        "# More Style\n## With headers !\n",
-        "You can also easily __add__ your own style with ``SimpleNotification.addTag()``.\nSee {{!https://github.com/Glagan/SimpleNotification#text-tag}} to know how.",
-        "![You can also have other images|https://oauth.net/images/code/javascript.png]\n---\nAnd you can separate content.",
+    let notifications = [
+        {
+            content: {
+                title: 'Title', text: 'Content'
+            },
+            options: {}
+        },
+        {
+            content: {
+                title: 'Multi-line', text: 'Can be multi-line using ``\\r``, ``\\r\\n`` or ``\\n``.\nLike this.'
+            },
+            options: {}
+        },
+        {
+            content: {
+                title: 'With Style !', text: 'Text can be *styled* **easily**, contain {{links|https://notification.nikurasu.org/}} and even ``code`` !'
+            },
+            options: {}
+        },
+        {
+            content: {
+                text: 'This notification doesn\'t have a title ! Crazy !'
+            },
+            options: {}
+        },
+        {
+            content: {
+                title: 'Headers', text: '# First Header\n## *Second* header\n'
+            },
+            options: {}
+        },
+        {
+            content: {
+                title: 'Forest', image: 'https://www.publicdomainpictures.net/pictures/100000/velka/forest-1411400424AOk.jpg'
+            },
+            options: {}
+        },
+        {
+            content: {
+                title: 'Custom Tags', text: 'You can also easily __add__ your own style with ``SimpleNotification.addTag()``.\nSee {{!https://github.com/Glagan/SimpleNotification#text-tag}} to know how.'
+            },
+            options: {}
+        },
+        {
+            content: {
+                title: 'Image and Separator', text: '![You can also have other images|https://oauth.net/images/code/javascript.png]\n---\nAnd you can separate content.'
+            },
+            options: {}
+        },
+        {
+            content: {
+                text: 'You have to choose an action to close this notification',
+                buttons: [{
+                    value: 'Open', type: 'success', onClick: (notification) => {
+                        SimpleNotification.success({
+                            title: 'Another One !', text: 'You opened another notification without closing the old one.'
+                        }, { position: 'top-left' })
+                    }
+                }, {
+                    value: 'Close', type: 'error', onClick: (notification) => {
+                        SimpleNotification.message({
+                            title: 'Closing...', text: 'The other notification will close with a fadeout thanks to ``notification.closeFadeout()``.'
+                        }, { position: 'bottom-right' });
+                        notification.closeFadeout();
+                    }
+                }]
+            },
+            options: { sticky: true, closeOnClick: false }
+        },
+        {
+            content: {
+                title: 'Click fast', text: 'You have to be fast to click the button on this one.',
+                buttons: [{
+                    value: 'Click me', type: 'info', onClick: (notification) => {
+                        SimpleNotification.success({
+                            title: 'Nice', text: 'You did it **:)**'
+                        }, { position: 'top-left' });
+                        notification.close();
+                    }
+                }]
+            },
+            options: { duration: 1000, events: {
+                onDeath: (notification) => {
+                    notification.disableButtons();
+                    notification.setType('info');
+                    notification.buttons.childNodes[0].textContent = 'Disabled';
+                    notification.setText('Buttons can be **disabled** after the timer expired.\nYou can also choose to hide the notification, or change a lot of it\'s content.');
+                }}
+            }
+        },
+        {
+            content: {
+                title: 'Modify after death', text: 'This notification will be updated after it\' *death* with nice buttons.\nLet it die to see it.',
+            },
+            options: {
+                closeOnClick: false,
+                duration: 1000,
+                events: {
+                    onDeath: (notification) => {
+                        notification.events.onDeath = undefined;
+                        notification.removeButtons();
+                        notification.setType('message');
+                        notification.addButton('error', 'Close', (notification) => {
+                            notification.closeFadeout();
+                        });
+                        notification.setText('You can now click on the button to close this notification.');
+                    }
+                }
+            }
+        },
     ];
-    let maxText = texts.length;
-    let currentText = 0;
+    let current = 0;
+    let max = notifications.length;
     // Make buttons show notifications
     document.querySelectorAll("[data-position]").forEach(button => {
         button.addEventListener("click", event => {
+            notifications[current].options.position = event.target.dataset.position;
             if (event.target.dataset.type == 'custom') {
-                SimpleNotification.custom(["gn-custom"], "Title", texts[currentText], undefined, undefined, {
-                    position: event.target.dataset.position,
-                    events: {
-                        onCreate: () => {
-                            console.log("Custom notification created");
-                        },
-                        onClose: (n, manual) => {
-                            if (manual) {
-                                SimpleNotification.message('Notification closed', 'You closed the last notification manually and you know it thanks to events !');
-                            }
-                        }
-                    }
-                });
+                SimpleNotification.custom(
+                    ["gn-custom"],
+                    notifications[current].content,
+                    notifications[current].options
+                );
             } else {
-                SimpleNotification[event.target.dataset.type]("Title", texts[currentText], undefined, undefined, {position: event.target.dataset.position});
+                SimpleNotification[event.target.dataset.type](
+                    notifications[current].content,
+                    notifications[current].options
+                );
             }
-            currentText = (currentText+1)%maxText;
+            current = (current+1)%max;
         });
     })
-    // Custom
+    // Notification Creator
     document.getElementById("custom").addEventListener("submit", event => {
         event.preventDefault();
         let form = event.target;
@@ -271,7 +368,11 @@
             closeOnClick: Math.floor(form.closeOnClick.value),
             closeButton: Math.floor(form.closeButton.value),
         };
-        SimpleNotification[form.type.value](form.title.value, form.text.value, form.image.value, undefined, options);
+        SimpleNotification[form.type.value]({
+            title: form.title.value,
+            text: form.text.value,
+            image: form.image.value
+        }, options);
     });
     </script>
 </body>

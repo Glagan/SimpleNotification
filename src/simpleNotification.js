@@ -241,6 +241,16 @@ class SimpleNotification {
         }
     }
 
+    setType(type) {
+        if (this.node) {
+            let closeOnClick = this.node.classList.contains('gn-close-on-click');
+            this.node.className = ['gn-notification gn-', type].join('');
+            if (closeOnClick) {
+                this.node.classList.add('gn-close-on-click');
+            }
+        }
+    }
+
     setDuration(tm) {
         this.duration = tm;
     }
@@ -249,12 +259,15 @@ class SimpleNotification {
         this.fadeoutTime = tm;
     }
 
-    setWrapper(wrapper) {
-        if (this.wrapper != undefined &&
-            this.node != undefined) {
-            wrapper.appendChild(this.node);
+    setPosition(position) {
+        // Create wrapper if needed
+        if (!(position in SimpleNotification.wrappers)) {
+            SimpleNotification.makeWrapper(position);
         }
-        this.wrapper = wrapper;
+        this.wrapper = SimpleNotification.wrappers[position];
+        if (this.node) {
+            this.wrapper.appendChild(this.node);
+        }
     }
 
     addCloseOnClick() {
@@ -273,7 +286,10 @@ class SimpleNotification {
     setTitle(title) {
         if (this.title == undefined) {
             this.title = document.createElement('h1');
-            this.node.appendChild(this.title);
+            this.node.insertBefore(this.title, this.node.firstElementChild);
+            if (this.closeButton) {
+                this.title.appendChild(this.closeButton);
+            }
         }
         this.title.title = title;
         this.title.textContent = title;
@@ -291,7 +307,7 @@ class SimpleNotification {
             closeButton.classList.add("gn-close-title");
             this.title.appendChild(closeButton);
         } else {
-            this.node.insertBefore(closeButton, this.node.firstChild);
+            this.node.insertBefore(closeButton, this.node.firstElementChild);
         }
     }
 
@@ -299,12 +315,19 @@ class SimpleNotification {
         this.body = document.createElement('div');
         this.body.className = 'gn-content';
         this.node.appendChild(this.body);
+        if (this.buttons) {
+            this.node.insertBefore(this.body, this.buttons);
+        } else if (this.progressBar) {
+            this.node.insertBefore(this.body, this.progressBar);
+        } else {
+            this.node.appendChild(this.body);
+        }
     }
 
     setImage(image) {
         if (this.image == undefined) {
             this.image = document.createElement('img');
-            if (this.text != undefined) {
+            if (this.text) {
                 this.body.insertBefore(this.image, this.text);
             } else {
                 this.body.appendChild(this.image);
@@ -318,6 +341,10 @@ class SimpleNotification {
             this.text = document.createElement('div');
             this.text.className = 'gn-text';
             this.body.appendChild(this.text);
+        } else {
+            while (this.text.firstChild) {
+                this.text.removeChild(this.text.firstChild);
+            }
         }
         SimpleNotification.textToNode(content, this.text);
     }
@@ -326,16 +353,29 @@ class SimpleNotification {
         if (this.buttons == undefined) {
             this.buttons = document.createElement('div');
             this.buttons.className = 'gn-buttons';
-            this.node.appendChild(this.buttons);
+            if (this.progressBar) {
+                this.node.insertBefore(this.buttons, this.progressBar);
+            } else {
+                this.node.appendChild(this.buttons);
+            }
         }
         let button = document.createElement('button');
         SimpleNotification.textToNode(value, button);
         button.className = ['gn-button gn-', type].join('');
-        button.addEventListener('click', event => {
-            event.stopPropagation();
-            onClick(this);
-        });
+        if (onClick) {
+            button.addEventListener('click', event => {
+                event.stopPropagation();
+                onClick(this);
+            });
+        }
         this.buttons.appendChild(button);
+    }
+
+    removeButtons() {
+        if (this.buttons) {
+            this.node.removeChild(this.buttons);
+            this.buttons = undefined;
+        }
     }
 
     addProgressBar() {
@@ -349,6 +389,7 @@ class SimpleNotification {
                 if (this.events.onDeath) {
                     this.events.onDeath(this);
                 } else {
+                    this.disableButtons();
                     this.closeFadeout();
                 }
             }
@@ -417,16 +458,18 @@ class SimpleNotification {
         this.progressBar.classList.remove('gn-extinguish');
     }
 
-    /**
-     * Remove reset events and add the fadeout animation
-     */
-    closeFadeout() {
-        // Disable buttons
+    disableButtons() {
         if (this.buttons) {
             for (let i = 0, max = this.buttons.childNodes.length; i < max; i++) {
                 this.buttons.childNodes[i].disabled = true;
             }
         }
+    }
+
+    /**
+     * Remove reset events and add the fadeout animation
+     */
+    closeFadeout() {
         // Remove the timer animation
         this.node.removeEventListener('mouseenter', this.removeExtinguish);
         this.node.removeEventListener('mouseleave', this.addExtinguish);
@@ -444,33 +487,29 @@ class SimpleNotification {
 
     /**
      * Create and append a notification
+     * content is an object with the keys title, text, image and buttons
      * Options: duration, fadeout, position
      * @param {array} classes Array of classes to add to the notification
-     * @param {string} title The title inside the notification
-     * @param {string} text The text inside the notification
-     * @param {string} image Image to be displayed in the notification
+     * @param {string} content The content the notification
      * @param {object} options The options of the notifications
      */
-    static create(classes, title=undefined, text=undefined, image=undefined, buttons=undefined, notificationOptions={}) {
-        let hasImage = (image != undefined && image != ''),
-            hasText = (text != undefined && text != ''),
-            hasTitle = (title != undefined && title != '');
+    static create(classes, content, notificationOptions={}) {
+        let hasImage = ('image' in content && content.image != ''),
+            hasText = ('text' in content && content.text != ''),
+            hasTitle = ('title' in content && content.title != ''),
+            hasButtons = ('buttons' in content && content.buttons != '');
         // Abort if empty
-        if (!hasImage && !hasTitle && !hasText) return;
+        if (!hasImage && !hasTitle && !hasText && !hasButtons) return;
         // Merge options
         let options = Object.assign({}, SimpleNotification.default, notificationOptions);
         // If there is nothing to close a notification we force the close button
         options.closeButton = (!options.closeOnClick && options.sticky) ? true : options.closeButton;
-        // Create wrapper if needed
-        if (!(options.position in SimpleNotification.wrappers)) {
-            SimpleNotification.makeWrapper(options.position);
-        }
         // Create the notification
         let notification = new SimpleNotification(options.events);
+        notification.make(classes);
         notification.setDuration(options.duration);
         notification.setFadeoutTime(options.fadeout);
-        notification.make(classes);
-        notification.setWrapper(SimpleNotification.wrappers[options.position]);
+        notification.setPosition(options.position);
         // Events
         // Delete the notification on click
         if (options.closeOnClick) {
@@ -482,7 +521,7 @@ class SimpleNotification {
         }
         // Add elements
         if (hasTitle) {
-            notification.setTitle(title);
+            notification.setTitle(content.title);
         }
         if (options.closeButton) {
             notification.addCloseButton();
@@ -490,18 +529,18 @@ class SimpleNotification {
         if (hasImage || hasText) {
             notification.addBody();
             if (hasImage) {
-                notification.setImage(image);
+                notification.setImage(content.image);
             }
             if (hasText) {
-                notification.setText(text);
+                notification.setText(content.text);
             }
         }
-        if (buttons) {
-            if (!Array.isArray(buttons)) {
-                buttons = [ buttons ];
+        if (hasButtons) {
+            if (!Array.isArray(content.buttons)) {
+                content.buttons = [ content.buttons ];
             }
-            for (let i = 0, max = buttons.length; i < max; i++) {
-                notification.addButton(buttons[i].type, buttons[i].value, buttons[i].onClick);
+            for (let i = 0, max = content.buttons.length; i < max; i++) {
+                notification.addButton(content.buttons[i].type, content.buttons[i].value, content.buttons[i].onClick);
             }
         }
         // Add progress bar if not sticky
@@ -509,75 +548,65 @@ class SimpleNotification {
             notification.addProgressBar();
         }
         // Display
-        notification.display();
+        if (!('display' in options) || options.display) {
+            notification.display();
+        }
         return notification;
     }
 
     /**
      * Create a notification with the 'success' style
-     * @param {string} title Title of the notification
-     * @param {string} text Content of the notification
-     * @param {string} image Image to be displayed in the notification
+     * @param {object} content Content of the notification
      * @param {object} options Options used for the notification
      */
-    static success(title=undefined, text=undefined, image=undefined, buttons=undefined, options={}) {
-        return this.create(['gn-success'], title, text, image, buttons, options);
+    static success(content, options={}) {
+        return this.create(['gn-success'], content, options);
     }
 
     /**
      * Create a notification with the 'info' style
-     * @param {string} title Title of the notification
-     * @param {string} text Content of the notification
-     * @param {string} image Image to be displayed in the notification
+     * @param {object} content Content of the notification
      * @param {object} options Options used for the notification
      */
-    static info(title=undefined, text=undefined, image=undefined, buttons=undefined, options={}) {
-        return this.create(['gn-info'], title, text, image, buttons, options);
+    static info(content, options={}) {
+        return this.create(['gn-info'], content, options);
     }
 
     /**
      * Create a notification with the 'error' style
-     * @param {string} title Title of the notification
-     * @param {string} text Content of the notification
-     * @param {string} image Image to be displayed in the notification
+     * @param {object} content Content of the notification
      * @param {object} options Options used for the notification
      */
-    static error(title=undefined, text=undefined, image=undefined, buttons=undefined, options={}) {
-        return this.create(['gn-error'], title, text, image, buttons, options);
+    static error(content, options={}) {
+        return this.create(['gn-error'], content, options);
     }
 
     /**
      * Create a notification with the 'warning' style
-     * @param {string} title Title of the notification
-     * @param {string} text Content of the notification
-     * @param {string} image Image to be displayed in the notification
+     * @param {object} content Content of the notification
      * @param {object} options Options used for the notification
      */
-    static warning(title=undefined, text=undefined, image=undefined, buttons=undefined, options={}) {
-        return this.create(['gn-warning'], title, text, image, buttons, options);
+    static warning(content, options={}) {
+        return this.create(['gn-warning'], content, options);
     }
 
     /**
      * Create a notification with the 'message' style
-     * @param {string} title Title of the notification
-     * @param {string} text Content of the notification
-     * @param {string} image Image to be displayed in the notification
+     * @param {object} content Content of the notification
      * @param {object} options Options used for the notification
      */
-    static message(title=undefined, text=undefined, image=undefined, buttons=undefined, options={}) {
-        return this.create(['gn-message'], title, text, image, buttons, options);
+    static message(content, options={}) {
+        return this.create(['gn-message'], content, options);
     }
 
     /**
      * Make a notification with custom classes
      * @param {array} classes The classes of the notification
-     * @param {string} title Title of the notification
-     * @param {string} text Content of the notification
-     * @param {string} image Image to be displayed in the notification
+     * @param {object} content Content of the notification
      * @param {object} options Options used for the notification
      */
-    static custom(classes, title=undefined, text=undefined, image=undefined, buttons=undefined, options={}) {
-        return this.create(classes, title, text, image, buttons, options);
+    static custom(classes, content, options={}) {
+        return this.create(classes, content, options);
     }
 
     /**
