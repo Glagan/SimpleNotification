@@ -494,10 +494,10 @@ class SimpleNotification {
      * @param {object} options The options of the notifications
      */
     static create(classes, content, notificationOptions={}) {
-        let hasImage = ('image' in content && content.image != ''),
-            hasText = ('text' in content && content.text != ''),
-            hasTitle = ('title' in content && content.title != ''),
-            hasButtons = ('buttons' in content && content.buttons != '');
+        let hasImage = ('image' in content && content.image),
+            hasText = ('text' in content && content.text),
+            hasTitle = ('title' in content && content.title),
+            hasButtons = ('buttons' in content);
         // Abort if empty
         if (!hasImage && !hasTitle && !hasText && !hasButtons) return;
         // Merge options
