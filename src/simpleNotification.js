@@ -1,4 +1,24 @@
 class SimpleNotification {
+    constructor(events) {
+        this.node = undefined;
+        this.wrapper = undefined;
+        // Content
+        this.title = undefined;
+        this.closeButton = undefined;
+        this.body = undefined;
+        this.image = undefined;
+        this.text = undefined;
+        this.progressBar = undefined;
+        // Events
+        this.events = {};
+        Object.keys(events).forEach(key => {
+            this.events[key] = events[key];
+        });
+        // Functions
+        this.addExtinguish = this.addExtinguishFct.bind(this);
+        this.removeExtinguish = this.removeExtinguishFct.bind(this);
+    }
+
     /**
      * Set the default options of SimpleNotification
      * @param {object} options Options object to override the defaults
@@ -41,121 +61,355 @@ class SimpleNotification {
         return foundPos;
     }
 
-    /**
-     * Transform a text with tags to a DOM Tree
-     * {open}content{close} {open}{!|title:}content{close}
-     * @param {object} notificationText The node where the text will be added
-     * @param {string} text The text with tags
-     */
-    static treeFromText(node, text) {
-        // Normalize linebreak
-        text = text.replace(/(\r?\n|\r)/gm, '\n');
-        // Find tokens
-        let specialNodes = [];
-        let specialCount = 0;
-        Object.keys(SimpleNotification.tags).forEach(tagName => {
-            let tag = SimpleNotification.tags[tagName];
-            let lastTokenPos = 0;
-            // Tag length
-            let tagLength = {open: tag.open.length, close: tag.close.length};
-            // Find strings that match tag
-            let foundOpenPos, foundClosePos;
-            while ((foundOpenPos = text.indexOf(tag.open, lastTokenPos)) > -1) {
-                foundOpenPos += tagLength.open; // Add the tag length to the found position
-                // Find the closing tag
-                if ((foundClosePos = text.indexOf(tag.close, foundOpenPos)) > -1 && foundOpenPos != foundClosePos) {
-                    let foundResult = {
-                        type: tagName,
-                        content: text.substring(foundOpenPos, foundClosePos)
-                    };
-                    // Search for title if tag can have one
-                    if ('title' in tag && tag.title && foundResult.content.length > 0) {
-                        if (foundResult.content[0] == '!') {
-                            foundResult.content = foundResult.content.substring(1);
-                        } else {
-                            // find :
-                            let foundTitleBreak = SimpleNotification.firstUnbreakChar(foundResult.content, ':');
-                            foundResult.content = foundResult.content.replace('\\:', ':');
-                            if (foundTitleBreak > -1) {
-                                foundResult.title = foundResult.content.substring(0, foundTitleBreak);
-                                foundResult.content = foundResult.content.substring(foundTitleBreak + 1);
-                            }
+    static searchToken(string, token, start) {
+        let found = [ start[0], start[1] ];
+        for (let max = string.length; found[0] < max; found[0]++) {
+            if (typeof string[found[0]] == 'string' &&
+                ((found[1] = string[found[0]].indexOf(token, found[1])) > -1)) {
+                return found;
+            }
+            found[1] = 0;
+        }
+        return [ -1, -1 ];
+    }
+
+    static breakString(string, tag, start, end) {
+        let tagLength = { open: tag.open.length, close: tag.close.length };
+        if (start[0] != end[0]) {
+            let inside = { tag: tag, str: [ string[start[0]].substring(start[1]) ] };
+            let c = 0;
+            for (let i = start[0] + 1; i < end[0]; i++ , c++) {
+                inside.str.push(string[i]);
+            }
+            inside.str.push(string[end[0]].substring(0, end[1]));
+            inside.str = [ this.joinString(inside.str) ];
+            string.splice(start[0] + 1, c, inside);
+            end[0] = start[0] + 2;
+            string[start[0]] = string[start[0]].substring(0, start[1] - tagLength.open);
+            string[end[0]] = string[end[0]].substring(end[1] + tagLength.close);
+            return [end[0], 0];
+        } else {
+            string.splice(start[0] + 1, 0,
+                { tag: tag, str: [ string[start[0]].substring(start[1], end[1]) ] },
+                string[start[0]].substring(end[1] + tagLength.close));
+            string[start[0]] = string[start[0]].substring(0, start[1] - tagLength.open);
+            return [start[0] + 2, 0];
+        }
+    }
+
+    static joinString(arr) {
+        let str = [];
+        for (let i = 0, max = arr.length; i < max; i++) {
+            if (typeof arr[i] == 'string') {
+                str.push(arr[i]);
+            } else {
+                str.push(arr[i].tag.open);
+                str.push(this.joinString(arr[i].str));
+                str.push(arr[i].tag.close);
+            }
+        }
+        return str.join('');
+    }
+
+    static buildNode(string, node) {
+        for (let i = 0; i < string.length; i++) {
+            if (typeof string[i] == 'string') {
+                if (string[i].length > 0) {
+                    node.appendChild(document.createTextNode(string[i]));
+                }
+            } else {
+                let tagInfo = string[i].tag;
+                let tag = document.createElement(tagInfo.type);
+                if (tagInfo.type == 'a' || tagInfo.type == 'button') {
+                    tag.addEventListener("click", event => {
+                        event.stopPropagation();
+                    });
+                }
+                // Content
+                let title = undefined;
+                let content = this.joinString(string[i].str);
+                if ('title' in tagInfo && tagInfo.title && content.length > 0) {
+                    if (content.indexOf('!') == 0) {
+                        content = content.substring(1);
+                    } else {
+                        // find :
+                        let foundTitleBreak = this.firstUnbreakChar(content, ':');
+                        content = content.replace('\\:', ':');
+                        if (foundTitleBreak > -1) {
+                            title = content.substring(0, foundTitleBreak);
+                            content = content.substring(foundTitleBreak + 1);
                         }
                     }
-                    // Add the found tag to the list
-                    specialNodes.push(foundResult);
-                    // Replace the string by a token \id\
-                    // Remove the tagLength from foundOpenPos to capture the tag
-                    // Add the tagLength to foundClosePos to also capture the tag
-                    let newText = text.substring(0, foundOpenPos-tagLength.open) + '\\' + specialCount + '\\' + text.substring(foundClosePos+tagLength.close);
-                    text = newText;
-                    specialCount++;
                 }
-                // Update lastTokenPos to reduce the string length to search
-                lastTokenPos = foundOpenPos;
+                if (title == undefined) {
+                    title = content;
+                }
+                // Set attributes
+                if ('attributes' in tagInfo) {
+                    Object.keys(tagInfo.attributes).forEach(attributeName => {
+                        let attributeValue = tagInfo.attributes[attributeName]
+                            .replace('$content', content)
+                            .replace('$title', title);
+                        tag.setAttribute(attributeName, attributeValue);
+                    });
+                }
+                if ('textContent' in tagInfo && tagInfo.textContent) {
+                    tag.textContent = tagInfo.textContent
+                        .replace('$content', content)
+                        .replace('$title', title);
+                } else {
+                    this.textToNode(string[i].str, tag);
+                }
+                // Set a class if defined
+                if (tagInfo.class) {
+                    if (Array.isArray(tagInfo.class)) {
+                        for (let i = 0, max = tagInfo.class.length; i < max; i++) {
+                            tag.classList.add(tagInfo.class[i]);
+                        }
+                    } else {
+                        tag.className = tagInfo.class;
+                    }
+                }
+                node.appendChild(tag);
+            }
+        }
+        return node;
+    }
+
+    /**
+     * Transform a text with tags to a DOM node
+     * {open}{content}{close}
+     * {open}{!|title:}{content}{close}
+     * @param {string} text The text with tags
+     * @param {object} node The node where the text will be added
+     */
+    static textToNode(text, node) {
+        if (text == undefined) return;
+        let string = undefined;
+        if (Array.isArray(text)) {
+            string = text;
+        } else {
+            // Normalize linebreak
+            text = text.replace(/(\r?\n|\r)/gm, '\n');
+            string = [ text ];
+        }
+        // Break string by tokens
+        if (this.tokens == undefined || this.refreshTokens != undefined) {
+            this.tokens = Object.keys(SimpleNotification.tags);
+            this.refreshTokens = undefined;
+        }
+        for (let i = 0, last = this.tokens.length; i < last; i++) {
+            let tag = SimpleNotification.tags[this.tokens[i]];
+            let tagLength = { open: tag.open.length, close: tag.close.length };
+            let continueAt = [ 0, 0 ];
+            let openPos = [ 0, 0 ];
+            let closePos = [ 0, 0 ];
+            while((openPos = this.searchToken(string, tag.open, continueAt))[0] > -1) {
+                openPos[1] += tagLength.open;
+                if ((closePos = this.searchToken(string, tag.close, openPos))[0] > -1) {
+                    continueAt = this.breakString(string, tag, openPos, closePos);
+                } else {
+                    continueAt = openPos;
+                }
+            }
+        }
+        return this.buildNode(string, node);
+    }
+
+    make(classes) {
+        this.node = document.createElement('div');
+        // Apply Style
+        this.node.className = 'gn-notification gn-insert';
+        classes.forEach(className => {
+            this.node.classList.add(className);
+        });
+        if (this.events.onCreate) {
+            this.events.onCreate(this);
+        }
+    }
+
+    setWrapper(wrapper) {
+        if (this.wrapper != undefined &&
+            this.node != undefined) {
+            wrapper.appendChild(this.node);
+        }
+        this.wrapper = wrapper;
+    }
+
+    addCloseOnClick() {
+        this.node.title = 'Click to close.';
+        this.node.classList.add('gn-close-on-click');
+        this.node.addEventListener('click', () => {
+            this.close(true);
+        });
+    }
+
+    addStartStop() {
+        this.node.addEventListener('mouseenter', this.removeExtinguish);
+        this.node.addEventListener('mouseleave', this.addExtinguish);
+    }
+
+    setTitle(title) {
+        if (this.title == undefined) {
+            this.title = document.createElement('h1');
+            this.node.appendChild(this.title);
+        }
+        this.title.title = title;
+        this.title.textContent = title;
+    }
+
+    addCloseButton() {
+        let closeButton = document.createElement('span');
+        closeButton.title = 'Click to close.';
+        closeButton.className = 'gn-close';
+        closeButton.textContent = '\u274C';
+        closeButton.addEventListener('click', () => {
+            this.close(true);
+        });
+        if (this.title) {
+            closeButton.classList.add("gn-close-title");
+            this.title.appendChild(closeButton);
+        } else {
+            this.node.insertBefore(closeButton, this.node.firstChild);
+        }
+    }
+
+    addBody() {
+        this.body = document.createElement('div');
+        this.body.className = 'gn-content';
+        this.node.appendChild(this.body);
+    }
+
+    setImage(image) {
+        if (this.image == undefined) {
+            this.image = document.createElement('img');
+            if (this.text != undefined) {
+                this.body.insertBefore(this.image, this.text);
+            } else {
+                this.body.appendChild(this.image);
+            }
+        }
+        this.image.src = image;
+    }
+
+    setText(content) {
+        if (this.text == undefined) {
+            this.text = document.createElement('div');
+            this.text.className = 'gn-text';
+            this.body.appendChild(this.text);
+        }
+        SimpleNotification.textToNode(content, this.text);
+    }
+
+    addProgressBar(duration, fadeoutTime) {
+        this.progressBar = document.createElement('span');
+        this.progressBar.className = 'gn-lifespan';
+        // Destroy the notification when the animation end
+        let startFadeoutAfterShorten = event => {
+            if (event.animationName == 'shorten') {
+                this.startFadeout(fadeoutTime);
+                this.progressBar.removeEventListener('animationend', startFadeoutAfterShorten);
+            }
+        };
+        this.progressBar.addEventListener('animationend', startFadeoutAfterShorten);
+        // Put the extinguish in a event listener to start when insert animation is done
+        let startOnInsertFinish = event => {
+            if (event.animationName == 'insert-left' || event.animationName == 'insert-right') {
+                // Set the time before removing the notification
+                this.progressBar.style.animationDuration = [duration, 'ms'].join('');
+                if (document.hasFocus()) {
+                    this.progressBar.classList.add('gn-extinguish');
+                } else {
+                    // Start the extinguish animation only when the page is focused
+                    let addFocusExtinguish = () => {
+                        this.progressBar.classList.add('gn-extinguish');
+                        document.removeEventListener('focus', addFocusExtinguish);
+                    };
+                    document.addEventListener('focus', addFocusExtinguish);
+                }
+                // Remove event and style of insert
+                this.node.classList.remove('gn-insert');
+                this.node.removeEventListener('animationend', startOnInsertFinish);
+            }
+        };
+        this.node.addEventListener('animationend', startOnInsertFinish);
+        // When fadeout end, remove the node from the wrapper
+        this.node.addEventListener('animationend', event => {
+            if (event.animationName == 'fadeout') {
+                this.close(false);
             }
         });
-        if (specialNodes.length > 0) {
-            let parts = text.split(/\\(\d+)\\/);
-            let lastPart = parts.length;
-            for (let i = 0; i < lastPart; i++) {
-                // even index is simple text
-                if (i%2 == 0) {
-                    node.appendChild(document.createTextNode(parts[i]));
-                } else {
-                    let specialNode = specialNodes[parseInt(parts[i])];
-                    let tagInfo = SimpleNotification.tags[specialNode.type];
-                    let tag = document.createElement(tagInfo.type);
-                    // Set attributes
-                    if ('attributes' in tagInfo) {
-                        Object.keys(tagInfo.attributes).forEach(attributeName => {
-                            let attributeValue = tagInfo.attributes[attributeName]
-                                .replace('$content', specialNode.content)
-                                .replace('$title', ('title' in specialNode) ? specialNode.title : specialNode.content);
-                            tag.setAttribute(attributeName, attributeValue);
-                        });
-                    }
-                    // Text content based on tagInfo.textcontent
-                    let textContent = undefined;
-                    if ('textContent' in tagInfo) {
-                        textContent = tagInfo.textContent
-                            .replace('$content', specialNode.content)
-                            .replace('$title', ('title' in specialNode) ? specialNode.title : specialNode.content);
-                    } else {
-                        textContent = specialNode.content;
-                    }
-                    tag.textContent = textContent;
-                    // Set a class if defined
-                    tag.className = tagInfo.class || '';
-                    node.appendChild(tag);
-                }
+        this.node.appendChild(this.progressBar);
+    }
+
+    display() {
+        if (this.node) {
+            this.wrapper.appendChild(this.node);
+            if (this.events.onDisplay) {
+                this.events.onDisplay(this);
             }
-        } else {
-            node.textContent = text;
+        }
+    }
+
+    remove() {
+        if (this.node != undefined) {
+            this.node.remove();
+            this.node = undefined;
+            return true;
+        }
+        return false;
+    }
+
+    close(fromUser) {
+        if (this.remove() && this.events.onClose) {
+            this.events.onClose(this, fromUser);
         }
     }
 
     /**
      * Add the class 'gn-extinguish' to the event target
      * Used in create() and startFadeout() to be able to remove the eventListener.
-     * @param {object} event The fired event
      */
-    static addExtinguish(event) {
-        event.target.lastElementChild.classList.add('gn-extinguish');
+    addExtinguishFct() {
+        this.progressBar.classList.add('gn-extinguish');
     }
 
     /**
      * Remove the class 'gn-extinguish' to the event target
      * Used in create() and startFadeout() to be able to remove the eventListener.
-     * @param {object} event The fired event
      */
-    static removeExtinguish(event) {
-        event.target.lastElementChild.classList.remove('gn-extinguish');
+    removeExtinguishFct() {
+        this.progressBar.classList.remove('gn-extinguish');
+    }
+
+    /**
+     * Remove reset events and add the fadeout animation
+     * @param {object} notification The notification to remove
+     * @param {integer} fadeoutTime The duration of the fadeout animation
+     */
+    startFadeout(fadeoutTime) {
+        // Remove the timer animation
+        if (this.events.onEnter)
+            this.node.removeEventListener('mouseenter', this.events.onEnter);
+        this.node.removeEventListener('mouseenter', this.removeExtinguish);
+        if (this.events.onLeave)
+            this.node.removeEventListener('mouseleave', this.events.onLeave);
+        this.node.removeEventListener('mouseleave', this.addExtinguish);
+        // Add the fadeout animation
+        this.node.style.animationDuration = [fadeoutTime, 'ms'].join('');
+        this.node.classList.add('gn-fadeout');
+        // Pause and reset fadeout on hover
+        this.node.addEventListener('mouseenter', event => {
+            event.target.classList.remove('gn-fadeout');
+        });
+        this.node.addEventListener('mouseleave', event => {
+            event.target.classList.add('gn-fadeout');
+        });
     }
 
     /**
      * Create and append a notification
-     * Options: duration, fadeout, position, image
+     * Options: duration, fadeout, position
      * @param {array} classes Array of classes to add to the notification
      * @param {string} title The title inside the notification
      * @param {string} text The text inside the notification
@@ -177,127 +431,41 @@ class SimpleNotification {
             SimpleNotification.makeWrapper(options.position);
         }
         // Create the notification
-        let fragment = document.createDocumentFragment();
-        let notification = document.createElement('div');
-        // Apply Style
-        notification.className = 'gn-notification gn-insert';
-        classes.forEach(element => {
-            notification.classList.add(element);
-        });
+        let notification = new SimpleNotification(options.events);
+        notification.make(classes);
+        notification.setWrapper(SimpleNotification.wrappers[options.position]);
         // Events
         // Delete the notification on click
         if (options.closeOnClick) {
-            notification.classList.add('gn-close-on-click');
-            notification.addEventListener('click', () => {
-                notification.remove();
-            });
+            notification.addCloseOnClick();
         }
         // Pause on hover if not sticky
         if (!options.sticky) {
-            notification.addEventListener('mouseenter', SimpleNotification.removeExtinguish);
-            notification.addEventListener('mouseleave', SimpleNotification.addExtinguish);
+            notification.addStartStop();
         }
         // Add elements
         if (hasTitle) {
-            let notificationTitle = document.createElement('h1');
-            notificationTitle.title = title;
-            notificationTitle.textContent = title;
-            notification.appendChild(notificationTitle);
+            notification.setTitle(title);
         }
         if (options.closeButton) {
-            let closeButton = document.createElement('span');
-            closeButton.className = 'gn-close';
-            closeButton.textContent = '\u274C';
-            closeButton.addEventListener('click', () => {
-                notification.remove();
-            });
-            if (hasTitle) {
-                closeButton.classList.add("gn-close-title");
-                notification.firstElementChild.appendChild(closeButton);
-            } else {
-                notification.insertBefore(closeButton, notification.firstChild);
-            }
+            notification.addCloseButton();
         }
         if (hasImage || hasText) {
-            let notificationContent = document.createElement('div');
-            notificationContent.className = 'gn-content';
+            notification.addBody();
             if (hasImage) {
-                let notificationImage = document.createElement('img');
-                notificationImage.src = image;
-                notificationContent.appendChild(notificationImage);
+                notification.setImage(image);
             }
             if (hasText) {
-                let notificationText = document.createElement('p');
-                SimpleNotification.treeFromText(notificationText, text);
-                notificationContent.appendChild(notificationText);
+                notification.setText(text);
             }
-            notification.appendChild(notificationContent);
         }
         // Add progress bar if not sticky
         if (!options.sticky) {
-            let notificationLife = document.createElement('span');
-            notificationLife.className = 'gn-lifespan';
-            // Destroy the notification when the animation end
-            let startFadeoutAfterShorten = event => {
-                if (event.animationName == 'shorten') {
-                    SimpleNotification.startFadeout(notification, options.fadeout);
-                    notificationLife.removeEventListener('animationend', startFadeoutAfterShorten);
-                }
-            };
-            notificationLife.addEventListener('animationend', startFadeoutAfterShorten);
-            // Put the extinguish in a event listener to start when insert animation is done
-            let startOnInsertFinish = event => {
-                if (event.animationName == 'insert-left' || event.animationName == 'insert-right') {
-                    // Set the time before removing the notification
-                    notificationLife.style.animationDuration = [options.duration, 'ms'].join('');
-                    if (document.hasFocus()) {
-                        notificationLife.classList.add('gn-extinguish');
-                    } else {
-                        // Start the extinguish animation only when the page is focused
-                        let addFocusExtinguish = () => {
-                            notificationLife.classList.add('gn-extinguish');
-                            document.removeEventListener('focus', addFocusExtinguish);
-                        };
-                        document.addEventListener('focus', addFocusExtinguish);
-                    }
-                    // Remove event and style of insert
-                    notification.classList.remove('gn-insert');
-                    notification.removeEventListener('animationend', startOnInsertFinish);
-                }
-            };
-            notification.addEventListener('animationend', startOnInsertFinish);
-            // When fadeout end, remove the node from the wrapper
-            notification.addEventListener('animationend', event => {
-                if (event.animationName == 'fadeout') {
-                    notification.remove();
-                }
-            });
-            notification.appendChild(notificationLife);
+            notification.addProgressBar(options.duration, options.fadeout);
         }
         // Display
-        fragment.appendChild(notification);
-        SimpleNotification.wrappers[options.position].appendChild(fragment);
-    }
-
-    /**
-     * Remove reset events and add the fadeout animation
-     * @param {object} notification The notification to remove
-     * @param {integer} fadeoutTime The duration of the fadeout animation
-     */
-    static startFadeout(notification, fadeoutTime) {
-        // Remove the timer animation
-        notification.removeEventListener('mouseenter', SimpleNotification.removeExtinguish);
-        notification.removeEventListener('mouseleave', SimpleNotification.addExtinguish);
-        // Add the fadeout animation
-        notification.style.animationDuration = [fadeoutTime, 'ms'].join('');
-        notification.classList.add('gn-fadeout');
-        // Pause and reset fadeout on hover
-        notification.addEventListener('mouseenter', event => {
-            event.target.classList.remove('gn-fadeout');
-        });
-        notification.addEventListener('mouseleave', event => {
-            event.target.classList.add('gn-fadeout');
-        });
+        notification.display();
+        return notification;
     }
 
     /**
@@ -308,7 +476,7 @@ class SimpleNotification {
      * @param {object} options Options used for the notification
      */
     static success(title=undefined, text=undefined, image=undefined, options = {}) {
-        return SimpleNotification.create(['gn-success'], title, text, image, options);
+        return this.create(['gn-success'], title, text, image, options);
     }
 
     /**
@@ -319,7 +487,7 @@ class SimpleNotification {
      * @param {object} options Options used for the notification
      */
     static info(title=undefined, text=undefined, image=undefined, options = {}) {
-        return SimpleNotification.create(['gn-info'], title, text, image, options);
+        return this.create(['gn-info'], title, text, image, options);
     }
 
     /**
@@ -330,7 +498,7 @@ class SimpleNotification {
      * @param {object} options Options used for the notification
      */
     static error(title=undefined, text=undefined, image=undefined, options = {}) {
-        return SimpleNotification.create(['gn-error'], title, text, image, options);
+        return this.create(['gn-error'], title, text, image, options);
     }
 
     /**
@@ -341,7 +509,7 @@ class SimpleNotification {
      * @param {object} options Options used for the notification
      */
     static warning(title=undefined, text=undefined, image=undefined, options = {}) {
-        return SimpleNotification.create(['gn-warning'], title, text, image, options);
+        return this.create(['gn-warning'], title, text, image, options);
     }
 
     /**
@@ -352,7 +520,7 @@ class SimpleNotification {
      * @param {object} options Options used for the notification
      */
     static message(title=undefined, text=undefined, image=undefined, options = {}) {
-        return SimpleNotification.create(['gn-message'], title, text, image, options);
+        return this.create(['gn-message'], title, text, image, options);
     }
 
     /**
@@ -364,16 +532,17 @@ class SimpleNotification {
      * @param {object} options Options used for the notification
      */
     static custom(classes, title=undefined, text=undefined, image=undefined, options = {}) {
-        return SimpleNotification.create(classes, title, text, image, options);
+        return this.create(classes, title, text, image, options);
     }
 
     /**
-     * Add a tag for the treeFromText function
+     * Add a tag for the textToNode function
      * @param {string} name The name of the tag
      * @param {object} object The values of the tag
      */
     static addTag(name, object) {
-        SimpleNotification.tags[name] = object;
+        this.tags[name] = object;
+        this.refreshTokens = true;
     }
 }
 SimpleNotification.wrappers = {};
@@ -384,25 +553,43 @@ SimpleNotification.default = {
     duration: 4000,
     fadeout: 750,
     sticky: false,
+    events: {
+        onCreate: undefined,
+        onDisplay: undefined,
+        onClose: undefined,
+    }
 };
+// TODO: Sort tags to check if they have the same start
 SimpleNotification.tags = {
     code: {
         type: 'code',
         class: 'gn-code',
         open: '``',
-        close: '``'
-    },
-    header3: {
-        type: 'h3',
-        class: 'gn-header',
-        open: '## ',
-        close: '\n'
+        close: '``',
+        textContent: '$content'
     },
     header2: {
         type: 'h2',
         class: 'gn-header',
+        open: '## ',
+        close: '\n'
+    },
+    header1: {
+        type: 'h1',
+        class: 'gn-header',
         open: '# ',
         close: '\n'
+    },
+    image: {
+        type: 'img',
+        title: true,
+        attributes: {
+            'src': '$content',
+            'title': '$title',
+        },
+        textContent: false,
+        open: '![',
+        close: ']'
     },
     link: {
         type: 'a',
@@ -410,6 +597,7 @@ SimpleNotification.tags = {
         attributes: {
             'href': '$content',
             'target': 'blank',
+            'title': '$title',
         },
         textContent: '$title',
         open: '{{',
@@ -427,4 +615,17 @@ SimpleNotification.tags = {
         open: '*',
         close: '*'
     },
+    separator: {
+        type: 'div',
+        class: 'gn-separator',
+        textContent: false,
+        open: '---\n',
+        close: ''
+    },
+    linejump: {
+        type: 'br',
+        textContent: false,
+        open: '\n',
+        close: '',
+    }
 };

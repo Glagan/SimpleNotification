@@ -71,7 +71,7 @@
             color: white;
         }
         .gn-custom p {
-            color: rgba(117, 9, 9, 0.945);
+            color: darkviolet;
         }
     </style>
 </head>
@@ -221,16 +221,17 @@
     <script>
     // Add Tag
     SimpleNotification.addTag('under', {
+        type: 'span',
         class: 'gn-cs-under',
         open: '__', close: '__'
     });
     // Data
     let texts = [
         "Content",
-        "Can be multi-line using ``\\r``, ``\\r\\n`` or ``\\n``.\r\nLike this.",
+        "Can be multi-line using ``\\r``, ``\\r\\n`` or ``\\n``.\nLike this.",
         "Text can be *styled* **easily**, contain {{links:https://notification.nikurasu.org/}} and even ``code`` !",
         "# More Style\r\n## With headers !\r\n",
-        "You can also easily __add__ your own style with ``SimpleNotification.addTag()``.\r\nSee {{!https://github.com/Glagan/SimpleNotification#text-tag}} to know how.",
+        "You can also easily __add__ your own style with ``SimpleNotification.addTag()``.\nSee {{!https://github.com/Glagan/SimpleNotification#text-tag}} to know how.",
     ];
     let maxText = texts.length;
     let currentText = 0;
@@ -238,7 +239,19 @@
     document.querySelectorAll("[data-position]").forEach(button => {
         button.addEventListener("click", event => {
             if (event.target.dataset.type == 'custom') {
-                SimpleNotification.custom(["gn-custom"], "Title", texts[currentText], undefined, {position: event.target.dataset.position});
+                SimpleNotification.custom(["gn-custom"], "Title", texts[currentText], undefined, {
+                    position: event.target.dataset.position,
+                    events: {
+                        onCreate: () => {
+                            console.log("Custom notification created");
+                        },
+                        onClose: (n, manual) => {
+                            if (manual) {
+                                SimpleNotification.message('Notification closed', 'You closed the last notification manually and you know it thanks to events !');
+                            }
+                        }
+                    }
+                });
             } else {
                 SimpleNotification[event.target.dataset.type]("Title", texts[currentText], undefined, {position: event.target.dataset.position});
             }

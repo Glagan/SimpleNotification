@@ -6,7 +6,7 @@ You can find a live demo here: [https://notification.nikurasu.org/](https://noti
 
 ## Installation
 
-You simply need to include ``simpleNotification.css`` (or it's minified version), ``simpleNotification.js`` and you're ready to go !
+You simply need to include ``simpleNotification.css``, ``simpleNotification.js`` and you're ready to go !
 
 ## How to use
 
@@ -48,8 +48,31 @@ There is a few options that you can set by using ``SimpleNotification.options(ob
 | sticky | If set to true, the notification will not disappear until the user click it or it's close button. |
 | closeButton | If set to true, a close button will be added, on the title or on the content. |
 | closeOnClick | If set to true, clicking anywhere in the notificaton will close it. |
+| events | See [Events](##Events) |
 
 > If a notification is ``sticky`` and ``closeOnClick`` is disabled, ``closeButton`` is set to true to always have a way to close a notification.
+
+## Events
+
+There is 3 events during the process of every notifications:
+
+### onCreate
+
+Called when the notification *node* is created but **empty**.
+
+The ``SimpleNotification`` object of the target notification is passed as a parameter ``onCreate(SimpleNotification)``.
+
+### onDisplay
+
+Called after the notification is added to it's wrapper.
+
+The ``SimpleNotification`` object of the target notification is passed as a parameter ``onDisplay(SimpleNotification)``.
+
+### onClose
+
+Called after the notification is closed.
+
+The ``SimpleNotification`` object of the target notification and if the notification has been manually closed are passed as parameters ``onClose(SimpleNotification, fromUser)``.
 
 ## Text Tag
 
@@ -61,8 +84,10 @@ You can insert links, or stylize text by using tags that ressemble **Markdown**.
 | Header (h2) | ``# Header 2\r\n`` |
 | Header (h3) | ``## Header 3\r\n`` |
 | Link | ``{{title:http://www.example.org/}}`` or ``{{!http://www.example.org/}}``|
+| Image | ``![title:http://www.example.org/image.jpg]`` or ``![!http://www.example.org/image.jpeg]``|
 | Bold | ``**http://www.example.org/**`` |
 | Italic | ``*http://www.example.org/*`` |
+| Separator | ``---\n`` |
 
 You can add custom tags easily by adding them to ``SimpleNotification.tags`` or by using ``SimpleNotification.addTag(name, object)``.  
 A tag object can have the following properties:
@@ -70,14 +95,15 @@ A tag object can have the following properties:
 ```javascript
 {
     type: 'span', // The node type, e.g <span>
-    class: 'class1 class2', // Optional class list (as a string) to use
+    class: ['class1', 'class2'], // Optional class list as an array or string to use
     attributes: {
         name: value
     }, // Optional attributes to set
     textContent: "$content", // textContent of the created node, see below for variables
+                             // If textContent is defined and not false the content cannot have childs (nested other tags)
     title: false, // See "Title" below
     open: '{{', // The opening token - any length
-    close: '}}' // The closing token - can be linebreak by using \n
+    close: '}}' // The closing token - can be linebreak by using \n - can also be empty
 }
 ```
 

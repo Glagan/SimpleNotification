@@ -62,17 +62,14 @@
     top: 0;
     right: 0;
 }
-
 .gn-top-left {
     top: 0;
     left: 0;
 }
-
 .gn-bottom-right {
     bottom: 0;
     right: 0;
 }
-
 .gn-bottom-left {
     bottom: 0;
     left: 0;
@@ -143,7 +140,7 @@
     border-bottom-left-radius: 0;
 }
 
-.gn-notification h1 {
+.gn-notification > h1 {
     background-color: rgba(0, 0, 0, 0.2);
     border-bottom: 1px solid rgba(0, 0, 0, 0.4);
     overflow: hidden;
@@ -156,38 +153,6 @@
     animation-name: fadeout;
     animation-timing-function: linear;
     animation-fill-mode: forwards;
-}
-
-.gn-content {
-    display: flex;
-    flex: 1;
-    align-content: space-between;
-    align-items: center;
-}
-.gn-content h2, .gn-content h3 {
-    margin: 0.5rem 0;
-}
-.gn-content img {
-    max-width: 40%;
-    max-height: 20rem;
-    flex-shrink: 1;
-}
-.gn-content p {
-    max-width: 100%;
-    white-space: pre-line;
-    word-break: break-word;
-}
-.gn-content img:only-child,
-.gn-content p:only-child {
-    max-width: 100%;
-}
-.gn-notification h1,
-.gn-content p {
-    padding: 0.5rem;
-    margin: 0;
-}
-.gn-content a {
-    color: rgba(255, 255, 255, 0.8);
 }
 
 .gn-lifespan {
@@ -226,6 +191,53 @@
     color: white;
 }
 
+.gn-content {
+    display: flex;
+    flex: 1;
+    align-content: space-between;
+    align-items: center;
+}
+.gn-content > img {
+    max-width: 40%;
+    max-height: 20rem;
+    flex-shrink: 1;
+}
+.gn-content .gn-text {
+    max-width: 100%;
+    /*hite-space: pre-line;*/
+    word-break: break-word;
+}
+.gn-content > img:only-child,
+.gn-content .gn-text:only-child {
+    max-width: 100%;
+}
+.gn-notification > h1,
+.gn-content .gn-text {
+    padding: 0.5rem;
+    margin: 0;
+}
+
+.gn-content .gn-text a {
+    color: rgba(255, 255, 255, 0.8);
+    transition: all .2s ease-in-out;
+}
+.gn-content .gn-text a:hover {
+    text-shadow: 1px 0 1px rgba(255, 255, 255, 0.8);
+    border-radius: 2px;
+}
+.gn-content .gn-text h1,
+.gn-content .gn-text h2 {
+    margin: 0.5rem 0;
+}
+.gn-content .gn-text h1 {
+    font-size: 1.2rem;
+}
+.gn-content .gn-text h2 {
+    font-size: 1.1rem;
+}
+.gn-content .gn-text img {
+    margin: 0.1rem 0;
+}
 .gn-bold {
     font-weight: bold;
 }
@@ -240,4 +252,17 @@
     line-height: 1.4;
     border-radius: 2px;
     box-shadow: 0 0 1px #333333;
+}
+.gn-message .gn-code {
+    background-color: #4D4D4D;
+    box-shadow: 0 0 1px #4D4D4D;
+}
+.gn-separator {
+    display: block;
+    width: 100%;
+    border-bottom: 1px solid white;
+    border-radius: 4px;
+    height: 2px;
+    line-height: 0px;
+    margin: .75rem 0;
 }
