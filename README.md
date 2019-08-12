@@ -85,8 +85,8 @@ Most of these tags can be nested to combine their effects.
 | Inline code | \`\`code\`\` |
 | Header (h1) | ``# Header 1\n`` |
 | Header (h2) | ``## Header 2\n`` |
-| Link | ``{{title|http://www.example.org/}}`` or ``{{http://www.example.org/}}`` without title. |
-| Image | ``![title|http://www.example.org/image.jpg]`` or ``![http://www.example.org/image.jpg]`` without title. |
+| Link | <code>{{title\|http://www.example.org/}}</code> or ``{{http://www.example.org/}}`` without title. |
+| Image | <code>![title\|http://www.example.org/image.jpg]</code> or ``![http://www.example.org/image.jpg]`` without title. |
 | Bold | ``**http://www.example.org/**`` |
 | Italic | ``*http://www.example.org/*`` |
 | Separator | ``\n---\n`` |
