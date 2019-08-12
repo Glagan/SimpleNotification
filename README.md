@@ -21,9 +21,9 @@ The five templates are ``success``, ``error``, ``info``, ``warning`` and ``messa
 ```javascript
 SimpleNotification.success({
     title: 'Title', // The title of the notification
-    image: 'url', // Optionnal image displayed inside the notification
+    image: 'url', // Optional image displayed inside the notification
     text: 'Content', // Content of the notification
-    // Optionnal list of buttons to interact with the notification
+    // Optional list of buttons to interact with the notification
     buttons: [{
         value: 'Confirm', // The text inside the button
         type: 'success', // The type of the button, same as for the notifications
