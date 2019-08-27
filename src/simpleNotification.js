@@ -130,7 +130,7 @@ class SimpleNotification {
                     });
                 }
                 // Content
-                let title = undefined;
+                let title;
                 let content = this.joinString(string[i].str);
                 if ('title' in tagInfo && tagInfo.title && content.length > 0) {
                     if (content.indexOf('!') == 0) {
@@ -150,18 +150,19 @@ class SimpleNotification {
                 }
                 // Set attributes
                 if ('attributes' in tagInfo) {
-                    Object.keys(tagInfo.attributes).forEach(attributeName => {
-                        let attributeValue = tagInfo.attributes[attributeName]
+                    let keys = Object.keys(tagInfo.attributes);
+                    for (let k = 0, max = keys.length; k < max; k++) {
+                        let attributeValue = tagInfo.attributes[keys[k]]
                             .replace('$content', content)
                             .replace('$title', title);
-                        tag.setAttribute(attributeName, attributeValue);
-                    });
+                        tag.setAttribute(keys[k], attributeValue);
+                    }
                 }
-                if ('textContent' in tagInfo && tagInfo.textContent) {
+                if (tagInfo.textContent) {
                     tag.textContent = tagInfo.textContent
                         .replace('$content', content)
                         .replace('$title', title);
-                } else {
+                } else if (tagInfo.textContent != false) {
                     this.textToNode(string[i].str, tag);
                 }
                 // Set a class if defined
@@ -189,7 +190,7 @@ class SimpleNotification {
      */
     static textToNode(text, node) {
         if (text == undefined) return;
-        let string = undefined;
+        let string;
         if (Array.isArray(text)) {
             string = text;
         } else {
