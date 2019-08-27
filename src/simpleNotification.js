@@ -65,6 +65,9 @@ class SimpleNotification {
         return foundPos;
     }
 
+    /**
+     * Search the first shortest occurence of token in the string array string after position start in the current string
+     */
     static searchToken(string, token, start) {
         let found = [ start[0], start[1] ];
         for (let max = string.length; found[0] < max; found[0]++) {
@@ -77,6 +80,9 @@ class SimpleNotification {
         return [ -1, -1 ];
     }
 
+    /**
+     * Break a string with a `tag` element at position start until end
+     */
     static breakString(string, tag, start, end) {
         let tagLength = { open: tag.open.length, close: tag.close.length };
         if (start[0] != end[0]) {
@@ -101,6 +107,9 @@ class SimpleNotification {
         }
     }
 
+    /**
+     * Recursive string array concatenation
+     */
     static joinString(arr) {
         let str = [];
         for (let i = 0, max = arr.length; i < max; i++) {
@@ -115,6 +124,9 @@ class SimpleNotification {
         return str.join('');
     }
 
+    /**
+     * Make the node body by build each of it's childrens
+     */
     static buildNode(string, node) {
         for (let i = 0; i < string.length; i++) {
             if (typeof string[i] == 'string') {
@@ -184,7 +196,7 @@ class SimpleNotification {
     /**
      * Transform a text with tags to a DOM node
      * {open}{content}{close}
-     * {open}{!|title:}{content}{close}
+     * {open}{!|title|}{content}{close} | is the title/content separator
      * @param {string} text The text with tags
      * @param {object} node The node where the text will be added
      */
@@ -221,6 +233,9 @@ class SimpleNotification {
         return this.buildNode(string, node);
     }
 
+    /**
+     * Create the notification node, set it's classes and call the onCreate event
+     */
     make(classes) {
         this.node = document.createElement('div');
         // Apply Style
@@ -242,6 +257,11 @@ class SimpleNotification {
         }
     }
 
+    /**
+     * Set the type of the notification
+     * success, info, error, warning, message
+     * It can be another CSS class but `type` will be prepended with `gn-`
+     */
     setType(type) {
         if (this.node) {
             let closeOnClick = this.node.classList.contains('gn-close-on-click');
@@ -252,14 +272,24 @@ class SimpleNotification {
         }
     }
 
+    /**
+     * Set the duration of the notification
+     */
     setDuration(tm) {
         this.duration = tm;
     }
 
+    /**
+     * Set the fadeout time of the notification
+     */
     setFadeoutTime(tm) {
         this.fadeoutTime = tm;
     }
 
+    /**
+     * Set the position of the notification
+     * top-left, top-right, bottom-left, bottom-right
+     */
     setPosition(position) {
         // Create wrapper if needed
         if (!(position in SimpleNotification.wrappers)) {
@@ -271,6 +301,9 @@ class SimpleNotification {
         }
     }
 
+    /**
+     * Add a click event to the whole notification node to close it
+     */
     addCloseOnClick() {
         this.node.title = 'Click to close.';
         this.node.classList.add('gn-close-on-click');
@@ -279,11 +312,17 @@ class SimpleNotification {
         });
     }
 
+    /**
+     * Add the mouseenter and mouseleave events that refresh the notification duration
+     */
     addStartStop() {
         this.node.addEventListener('mouseenter', this.removeExtinguish);
         this.node.addEventListener('mouseleave', this.addExtinguish);
     }
 
+    /**
+     * Set the title of the notification
+     */
     setTitle(title) {
         if (this.title == undefined) {
             this.title = document.createElement('h1');
@@ -296,6 +335,9 @@ class SimpleNotification {
         this.title.textContent = title;
     }
 
+    /**
+     * Add a close button to the top right of the notification
+     */
     addCloseButton() {
         let closeButton = document.createElement('span');
         closeButton.title = 'Click to close.';
@@ -312,6 +354,9 @@ class SimpleNotification {
         }
     }
 
+    /**
+     * Add the notification body that contains the notification image and text
+     */
     addBody() {
         this.body = document.createElement('div');
         this.body.className = 'gn-content';
@@ -325,22 +370,34 @@ class SimpleNotification {
         }
     }
 
-    setImage(image) {
+    /**
+     * Set the image src attribute
+     */
+    setImage(src) {
         if (this.image == undefined) {
             this.image = document.createElement('img');
             if (this.text) {
                 this.body.insertBefore(this.image, this.text);
             } else {
+                if (!this.body) {
+                    this.addBody();
+                }
                 this.body.appendChild(this.image);
             }
         }
-        this.image.src = image;
+        this.image.src = src;
     }
 
+    /**
+     * Set the text content of the notification body
+     */
     setText(content) {
         if (this.text == undefined) {
             this.text = document.createElement('div');
             this.text.className = 'gn-text';
+            if (!this.body) {
+                this.addBody();
+            }
             this.body.appendChild(this.text);
         } else {
             while (this.text.firstChild) {
@@ -350,6 +407,9 @@ class SimpleNotification {
         SimpleNotification.textToNode(content, this.text);
     }
 
+    /**
+     * Add a single button after all already added buttons
+     */
     addButton(type, value, onClick) {
         if (this.buttons == undefined) {
             this.buttons = document.createElement('div');
@@ -372,6 +432,9 @@ class SimpleNotification {
         this.buttons.appendChild(button);
     }
 
+    /**
+     * Remove all buttons
+     */
     removeButtons() {
         if (this.buttons) {
             this.node.removeChild(this.buttons);
@@ -379,6 +442,9 @@ class SimpleNotification {
         }
     }
 
+    /**
+     * Add the notification progress bar
+     */
     addProgressBar() {
         this.progressBar = document.createElement('span');
         this.progressBar.className = 'gn-lifespan';
@@ -419,6 +485,9 @@ class SimpleNotification {
         this.node.appendChild(this.progressBar);
     }
 
+    /**
+     * Append the notification body to it's wrapper and call the onDisplay event
+     */
     display() {
         if (this.node) {
             this.wrapper.appendChild(this.node);
@@ -428,6 +497,9 @@ class SimpleNotification {
         }
     }
 
+    /**
+     * Remove the notification from the screen without calling the onClose event
+     */
     remove() {
         if (this.node != undefined) {
             this.node.remove();
@@ -437,6 +509,9 @@ class SimpleNotification {
         return false;
     }
 
+    /**
+     * Remove the notification from the screen and call the onClose event
+     */
     close(fromUser) {
         if (this.remove() && this.events.onClose) {
             this.events.onClose(this, fromUser);
@@ -459,6 +534,9 @@ class SimpleNotification {
         this.progressBar.classList.remove('gn-extinguish');
     }
 
+    /**
+     * Add the disabled state to all displayed buttons
+     */
     disableButtons() {
         if (this.buttons) {
             for (let i = 0, max = this.buttons.childNodes.length; i < max; i++) {
