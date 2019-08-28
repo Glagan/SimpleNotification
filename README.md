@@ -62,6 +62,8 @@ There are a few options that you can set by using ``SimpleNotification.options(o
 | sticky | If true, the notification will not disappear until the user clicks it or its close button. | false |
 | closeButton | If true, a close button will be added either on the title or the content. | true |
 | closeOnClick | If true, clicking anywhere in the notification will close it. | true |
+| removeAllOnDisplay | If true, all notifications will be cleared before the new one is added to the screen. | false |
+| maxNotifications | If >0, notifications (starting with oldest) will clear out until the number displayed is less than or equal to the specified option. | 0 |
 | events | Object with events functions, see [Events](##Events) |
 | display | Display the notification when creating it. | true |
 
