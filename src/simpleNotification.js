@@ -1,5 +1,10 @@
 class SimpleNotification {
-    constructor(events) {
+    constructor(options=undefined) {
+        this.options = options;
+        if (this.options == undefined) {
+            this.options = Object.assign({}, SimpleNotification.default);
+        }
+        this.events = this.options.events;
         this.node = undefined;
         this.wrapper = undefined;
         // Content
@@ -11,13 +16,9 @@ class SimpleNotification {
         this.buttons = undefined;
         this.progressBar = undefined;
         //
-        this.duration = 0;
-        this.fadeoutTime = 0;
-        // Events
-        this.events = {};
-        Object.keys(events).forEach(key => {
-            this.events[key] = events[key];
-        });
+        this.setDuration(this.options.duration);
+        this.setFadeoutTime(this.options.fadeout);
+        this.setPosition(this.options.position);
         // Functions
         this.addExtinguish = this.addExtinguishFct.bind(this);
         this.removeExtinguish = this.removeExtinguishFct.bind(this);
@@ -490,7 +491,20 @@ class SimpleNotification {
      */
     display() {
         if (this.node) {
+            if (this.options.removeAllOnDisplay) {
+                SimpleNotification.displayed.forEach(n => {
+                    n.remove();
+                });
+            } else if (this.options.maxNotifications > 0) {
+                let diff = -(this.options.maxNotifications - (SimpleNotification.displayed.length + 1));
+                if (diff > 0) {
+                    for (let i = 0, max = diff; i < max; i++) {
+                        SimpleNotification.displayed[i].remove();
+                    }
+                }
+            }
             this.wrapper.appendChild(this.node);
+            SimpleNotification.displayed.push(this);
             if (this.events.onDisplay) {
                 this.events.onDisplay(this);
             }
@@ -504,6 +518,10 @@ class SimpleNotification {
         if (this.node != undefined) {
             this.node.remove();
             this.node = undefined;
+            let index = SimpleNotification.displayed.indexOf(this);
+            if (index) {
+                SimpleNotification.displayed.splice(index, 1);
+            }
             return true;
         }
         return false;
@@ -512,7 +530,7 @@ class SimpleNotification {
     /**
      * Remove the notification from the screen and call the onClose event
      */
-    close(fromUser) {
+    close(fromUser=false) {
         if (this.remove() && this.events.onClose) {
             this.events.onClose(this, fromUser);
         }
@@ -584,11 +602,8 @@ class SimpleNotification {
         // If there is nothing to close a notification we force the close button
         options.closeButton = (!options.closeOnClick && options.sticky) ? true : options.closeButton;
         // Create the notification
-        let notification = new SimpleNotification(options.events);
+        let notification = new SimpleNotification(options);
         notification.make(classes);
-        notification.setDuration(options.duration);
-        notification.setFadeoutTime(options.fadeout);
-        notification.setPosition(options.position);
         // Events
         // Delete the notification on click
         if (options.closeOnClick) {
@@ -605,14 +620,11 @@ class SimpleNotification {
         if (options.closeButton) {
             notification.addCloseButton();
         }
-        if (hasImage || hasText) {
-            notification.addBody();
-            if (hasImage) {
-                notification.setImage(content.image);
-            }
-            if (hasText) {
-                notification.setText(content.text);
-            }
+        if (hasImage) {
+            notification.setImage(content.image);
+        }
+        if (hasText) {
+            notification.setText(content.text);
         }
         if (hasButtons) {
             if (!Array.isArray(content.buttons)) {
@@ -699,8 +711,11 @@ class SimpleNotification {
     }
 }
 SimpleNotification.wrappers = {};
+SimpleNotification.displayed = [];
 SimpleNotification.default = {
     position: 'top-right',
+    maxNotifications: 0,
+    removeAllOnDisplay: false,
     closeOnClick: true,
     closeButton: true,
     duration: 4000,
