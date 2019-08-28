@@ -305,13 +305,16 @@
                     }
                 }]
             },
-            options: { duration: 1000, events: {
-                onDeath: (notification) => {
-                    notification.disableButtons();
-                    notification.setType('info');
-                    notification.buttons.childNodes[0].textContent = 'Disabled';
-                    notification.setText('Buttons can be **disabled** after the timer expired.\nYou can also choose to hide the notification, or change a lot of it\'s content.');
-                }}
+            options: { duration: 1000,
+                events: {
+                    onDeath: (notification) => {
+                        notification.disableButtons();
+                        notification.setType('info');
+                        notification.buttons.childNodes[0].textContent = 'Disabled';
+                        notification.setTitle('Gotta go faster');
+                        notification.setText('Buttons can be **disabled** after the timer expired.\nYou can also choose to hide the notification, or change a lot of it\'s content.');
+                    }
+                }
             }
         },
         {

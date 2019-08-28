@@ -1,5 +1,10 @@
 class SimpleNotification {
-    constructor(events) {
+    constructor(options=undefined) {
+        this.options = options;
+        if (this.options == undefined) {
+            this.options = Object.assign({}, SimpleNotification.default);
+        }
+        this.events = this.options.events;
         this.node = undefined;
         this.wrapper = undefined;
         // Content
@@ -11,13 +16,9 @@ class SimpleNotification {
         this.buttons = undefined;
         this.progressBar = undefined;
         //
-        this.duration = 0;
-        this.fadeoutTime = 0;
-        // Events
-        this.events = {};
-        Object.keys(events).forEach(key => {
-            this.events[key] = events[key];
-        });
+        this.setDuration(this.options.duration);
+        this.setFadeoutTime(this.options.fadeout);
+        this.setPosition(this.options.position);
         // Functions
         this.addExtinguish = this.addExtinguishFct.bind(this);
         this.removeExtinguish = this.removeExtinguishFct.bind(this);
@@ -65,6 +66,9 @@ class SimpleNotification {
         return foundPos;
     }
 
+    /**
+     * Search the first shortest occurence of token in the string array string after position start in the current string
+     */
     static searchToken(string, token, start) {
         let found = [ start[0], start[1] ];
         for (let max = string.length; found[0] < max; found[0]++) {
@@ -77,6 +81,9 @@ class SimpleNotification {
         return [ -1, -1 ];
     }
 
+    /**
+     * Break a string with a `tag` element at position start until end
+     */
     static breakString(string, tag, start, end) {
         let tagLength = { open: tag.open.length, close: tag.close.length };
         if (start[0] != end[0]) {
@@ -101,6 +108,9 @@ class SimpleNotification {
         }
     }
 
+    /**
+     * Recursive string array concatenation
+     */
     static joinString(arr) {
         let str = [];
         for (let i = 0, max = arr.length; i < max; i++) {
@@ -115,6 +125,9 @@ class SimpleNotification {
         return str.join('');
     }
 
+    /**
+     * Make the node body by build each of it's childrens
+     */
     static buildNode(string, node) {
         for (let i = 0; i < string.length; i++) {
             if (typeof string[i] == 'string') {
@@ -130,7 +143,7 @@ class SimpleNotification {
                     });
                 }
                 // Content
-                let title = undefined;
+                let title;
                 let content = this.joinString(string[i].str);
                 if ('title' in tagInfo && tagInfo.title && content.length > 0) {
                     if (content.indexOf('!') == 0) {
@@ -150,18 +163,19 @@ class SimpleNotification {
                 }
                 // Set attributes
                 if ('attributes' in tagInfo) {
-                    Object.keys(tagInfo.attributes).forEach(attributeName => {
-                        let attributeValue = tagInfo.attributes[attributeName]
+                    let keys = Object.keys(tagInfo.attributes);
+                    for (let k = 0, max = keys.length; k < max; k++) {
+                        let attributeValue = tagInfo.attributes[keys[k]]
                             .replace('$content', content)
                             .replace('$title', title);
-                        tag.setAttribute(attributeName, attributeValue);
-                    });
+                        tag.setAttribute(keys[k], attributeValue);
+                    }
                 }
-                if ('textContent' in tagInfo && tagInfo.textContent) {
+                if (tagInfo.textContent) {
                     tag.textContent = tagInfo.textContent
                         .replace('$content', content)
                         .replace('$title', title);
-                } else {
+                } else if (tagInfo.textContent != false) {
                     this.textToNode(string[i].str, tag);
                 }
                 // Set a class if defined
@@ -183,13 +197,13 @@ class SimpleNotification {
     /**
      * Transform a text with tags to a DOM node
      * {open}{content}{close}
-     * {open}{!|title:}{content}{close}
+     * {open}{!|title|}{content}{close} | is the title/content separator
      * @param {string} text The text with tags
      * @param {object} node The node where the text will be added
      */
     static textToNode(text, node) {
         if (text == undefined) return;
-        let string = undefined;
+        let string;
         if (Array.isArray(text)) {
             string = text;
         } else {
@@ -220,6 +234,9 @@ class SimpleNotification {
         return this.buildNode(string, node);
     }
 
+    /**
+     * Create the notification node, set it's classes and call the onCreate event
+     */
     make(classes) {
         this.node = document.createElement('div');
         // Apply Style
@@ -241,6 +258,11 @@ class SimpleNotification {
         }
     }
 
+    /**
+     * Set the type of the notification
+     * success, info, error, warning, message
+     * It can be another CSS class but `type` will be prepended with `gn-`
+     */
     setType(type) {
         if (this.node) {
             let closeOnClick = this.node.classList.contains('gn-close-on-click');
@@ -251,14 +273,24 @@ class SimpleNotification {
         }
     }
 
+    /**
+     * Set the duration of the notification
+     */
     setDuration(tm) {
         this.duration = tm;
     }
 
+    /**
+     * Set the fadeout time of the notification
+     */
     setFadeoutTime(tm) {
         this.fadeoutTime = tm;
     }
 
+    /**
+     * Set the position of the notification
+     * top-left, top-right, bottom-left, bottom-right
+     */
     setPosition(position) {
         // Create wrapper if needed
         if (!(position in SimpleNotification.wrappers)) {
@@ -270,6 +302,9 @@ class SimpleNotification {
         }
     }
 
+    /**
+     * Add a click event to the whole notification node to close it
+     */
     addCloseOnClick() {
         this.node.title = 'Click to close.';
         this.node.classList.add('gn-close-on-click');
@@ -278,11 +313,17 @@ class SimpleNotification {
         });
     }
 
+    /**
+     * Add the mouseenter and mouseleave events that refresh the notification duration
+     */
     addStartStop() {
         this.node.addEventListener('mouseenter', this.removeExtinguish);
         this.node.addEventListener('mouseleave', this.addExtinguish);
     }
 
+    /**
+     * Set the title of the notification
+     */
     setTitle(title) {
         if (this.title == undefined) {
             this.title = document.createElement('h1');
@@ -295,6 +336,9 @@ class SimpleNotification {
         this.title.textContent = title;
     }
 
+    /**
+     * Add a close button to the top right of the notification
+     */
     addCloseButton() {
         let closeButton = document.createElement('span');
         closeButton.title = 'Click to close.';
@@ -311,6 +355,9 @@ class SimpleNotification {
         }
     }
 
+    /**
+     * Add the notification body that contains the notification image and text
+     */
     addBody() {
         this.body = document.createElement('div');
         this.body.className = 'gn-content';
@@ -324,22 +371,34 @@ class SimpleNotification {
         }
     }
 
-    setImage(image) {
+    /**
+     * Set the image src attribute
+     */
+    setImage(src) {
         if (this.image == undefined) {
             this.image = document.createElement('img');
             if (this.text) {
                 this.body.insertBefore(this.image, this.text);
             } else {
+                if (!this.body) {
+                    this.addBody();
+                }
                 this.body.appendChild(this.image);
             }
         }
-        this.image.src = image;
+        this.image.src = src;
     }
 
+    /**
+     * Set the text content of the notification body
+     */
     setText(content) {
         if (this.text == undefined) {
             this.text = document.createElement('div');
             this.text.className = 'gn-text';
+            if (!this.body) {
+                this.addBody();
+            }
             this.body.appendChild(this.text);
         } else {
             while (this.text.firstChild) {
@@ -349,6 +408,9 @@ class SimpleNotification {
         SimpleNotification.textToNode(content, this.text);
     }
 
+    /**
+     * Add a single button after all already added buttons
+     */
     addButton(type, value, onClick) {
         if (this.buttons == undefined) {
             this.buttons = document.createElement('div');
@@ -371,6 +433,9 @@ class SimpleNotification {
         this.buttons.appendChild(button);
     }
 
+    /**
+     * Remove all buttons
+     */
     removeButtons() {
         if (this.buttons) {
             this.node.removeChild(this.buttons);
@@ -378,6 +443,9 @@ class SimpleNotification {
         }
     }
 
+    /**
+     * Add the notification progress bar
+     */
     addProgressBar() {
         this.progressBar = document.createElement('span');
         this.progressBar.className = 'gn-lifespan';
@@ -418,25 +486,51 @@ class SimpleNotification {
         this.node.appendChild(this.progressBar);
     }
 
+    /**
+     * Append the notification body to it's wrapper and call the onDisplay event
+     */
     display() {
         if (this.node) {
+            if (this.options.removeAllOnDisplay) {
+                SimpleNotification.displayed.forEach(n => {
+                    n.remove();
+                });
+            } else if (this.options.maxNotifications > 0) {
+                let diff = -(this.options.maxNotifications - (SimpleNotification.displayed.length + 1));
+                if (diff > 0) {
+                    for (let i = 0, max = diff; i < max; i++) {
+                        SimpleNotification.displayed[i].remove();
+                    }
+                }
+            }
             this.wrapper.appendChild(this.node);
+            SimpleNotification.displayed.push(this);
             if (this.events.onDisplay) {
                 this.events.onDisplay(this);
             }
         }
     }
 
+    /**
+     * Remove the notification from the screen without calling the onClose event
+     */
     remove() {
         if (this.node != undefined) {
             this.node.remove();
             this.node = undefined;
+            let index = SimpleNotification.displayed.indexOf(this);
+            if (index) {
+                SimpleNotification.displayed.splice(index, 1);
+            }
             return true;
         }
         return false;
     }
 
-    close(fromUser) {
+    /**
+     * Remove the notification from the screen and call the onClose event
+     */
+    close(fromUser=false) {
         if (this.remove() && this.events.onClose) {
             this.events.onClose(this, fromUser);
         }
@@ -458,6 +552,9 @@ class SimpleNotification {
         this.progressBar.classList.remove('gn-extinguish');
     }
 
+    /**
+     * Add the disabled state to all displayed buttons
+     */
     disableButtons() {
         if (this.buttons) {
             for (let i = 0, max = this.buttons.childNodes.length; i < max; i++) {
@@ -505,11 +602,8 @@ class SimpleNotification {
         // If there is nothing to close a notification we force the close button
         options.closeButton = (!options.closeOnClick && options.sticky) ? true : options.closeButton;
         // Create the notification
-        let notification = new SimpleNotification(options.events);
+        let notification = new SimpleNotification(options);
         notification.make(classes);
-        notification.setDuration(options.duration);
-        notification.setFadeoutTime(options.fadeout);
-        notification.setPosition(options.position);
         // Events
         // Delete the notification on click
         if (options.closeOnClick) {
@@ -526,14 +620,11 @@ class SimpleNotification {
         if (options.closeButton) {
             notification.addCloseButton();
         }
-        if (hasImage || hasText) {
-            notification.addBody();
-            if (hasImage) {
-                notification.setImage(content.image);
-            }
-            if (hasText) {
-                notification.setText(content.text);
-            }
+        if (hasImage) {
+            notification.setImage(content.image);
+        }
+        if (hasText) {
+            notification.setText(content.text);
         }
         if (hasButtons) {
             if (!Array.isArray(content.buttons)) {
@@ -620,8 +711,11 @@ class SimpleNotification {
     }
 }
 SimpleNotification.wrappers = {};
+SimpleNotification.displayed = [];
 SimpleNotification.default = {
     position: 'top-right',
+    maxNotifications: 0,
+    removeAllOnDisplay: false,
     closeOnClick: true,
     closeButton: true,
     duration: 4000,
