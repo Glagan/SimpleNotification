@@ -27,6 +27,17 @@
     }
 }
 
+@keyframes insert-bottom {
+    from {
+        transform: rotateX(-70deg);
+        transform-origin: bottom;
+    }
+    to {
+        transform: rotateX(0deg);
+        transform-origin: bottom;
+    }
+}
+
 @keyframes insert-right {
     from {
         transform: rotateY(-70deg);
@@ -66,13 +77,18 @@
     top: 0;
     left: 0;
 }
-.gn-bottom-right {
-    bottom: 0;
-    right: 0;
-}
 .gn-bottom-left {
     bottom: 0;
     left: 0;
+}
+.gn-bottom-center {
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%) translateY(-100%);
+}
+.gn-bottom-right {
+    bottom: 0;
+    right: 0;
 }
 
 .gn-notification {
@@ -106,6 +122,10 @@
 .gn-top-right .gn-insert,
 .gn-bottom-right .gn-insert {
     animation-name: insert-right;
+}
+
+.gn-bottom-center .gn-insert {
+    animation-name: insert-bottom;
 }
 
 .gn-close-on-click {
