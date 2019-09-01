@@ -3,7 +3,7 @@
 *SimpleNotification* is a library to display simple yet customizable notifications. 
 You can stylize text with a simple syntax, add buttons to make the notifications interactable and add callbacks for some events during the life of a notification. 
 
-*SimpleNotification* weighs **9.98 Kb** (**3.38Kb** gziped), with no dependencies.
+*SimpleNotification* weighs **10.50 Kb** (**3.50 Kb** gziped), with no dependencies.
 
 You can find a live demo here: [https://notification.nikurasu.org/](https://notification.nikurasu.org/)
 
@@ -58,7 +58,7 @@ There are a few options that you can set by using ``SimpleNotification.options(o
 |---|---|---|
 | duration | The time (in ms) that the notification is displayed. | 4000 |
 | fadeout | The duration (in ms) of the fadeout animation when the notification display time is over. | 400 |
-| position | Valid positions: ``top-left``, ``top-right``, ``bottom-left`` and ``bottom-right``. | top-right |
+| position | Valid positions: ``top-left``, ``top-right``, ``bottom-left``, ``bottom-center`` and ``bottom-right``. | top-right |
 | sticky | If true, the notification will not disappear until the user clicks it or its close button. | false |
 | closeButton | If true, a close button will be added either on the title or the content. | true |
 | closeOnClick | If true, clicking anywhere in the notification will close it. | true |

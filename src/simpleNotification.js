@@ -2,7 +2,7 @@ class SimpleNotification {
     constructor(options=undefined) {
         this.options = options;
         if (this.options == undefined) {
-            this.options = Object.assign({}, SimpleNotification.default);
+            this.options = Object.assign({}, SimpleNotification._options);
         }
         this.events = this.options.events;
         this.node = undefined;
@@ -29,12 +29,12 @@ class SimpleNotification {
      * @param {object} options Options object to override the defaults
      */
     static options(options) {
-        SimpleNotification.default = Object.assign({}, SimpleNotification.default, options);
+        SimpleNotification._options = Object.assign({}, SimpleNotification._options, options);
     }
 
     /**
      * Create a wrapper and add it to the wrappers object
-     * Valid default position: top-right, top-left, bottom-right, bottom-left
+     * Valid default position: top-left, top-right, bottom-left, bottom-center, bottom-right
      * @param {string} position The position of the wrapper
      */
     static makeWrapper(position) {
@@ -249,7 +249,9 @@ class SimpleNotification {
             if (event.animationName == 'fadeout') {
                 this.close(false);
             } else if (event.animationName == 'insert-left' ||
-                event.animationName == 'insert-right') {
+                event.animationName == 'insert-right' ||
+                event.animationName == 'insert-bottom' ||
+                event.animationName == 'insert-top') {
                 this.node.classList.remove('gn-insert');
             }
         });
@@ -289,7 +291,7 @@ class SimpleNotification {
 
     /**
      * Set the position of the notification
-     * top-left, top-right, bottom-left, bottom-right
+     * top-left, top-right, bottom-left, bottom-center, bottom-right
      */
     setPosition(position) {
         // Create wrapper if needed
@@ -465,7 +467,10 @@ class SimpleNotification {
         this.progressBar.addEventListener('animationend', startFadeoutAfterShorten);
         // Put the extinguish in a event listener to start when insert animation is done
         let startOnInsertFinish = event => {
-            if (event.animationName == 'insert-left' || event.animationName == 'insert-right') {
+            if (event.animationName == 'insert-left' ||
+                event.animationName == 'insert-right' ||
+                event.animationName == 'insert-bottom' ||
+                event.animationName == 'insert-top') {
                 // Set the time before removing the notification
                 this.progressBar.style.animationDuration = [this.duration, 'ms'].join('');
                 if (document.hasFocus()) {
@@ -598,7 +603,7 @@ class SimpleNotification {
         // Abort if empty
         if (!hasImage && !hasTitle && !hasText && !hasButtons) return;
         // Merge options
-        let options = Object.assign({}, SimpleNotification.default, notificationOptions);
+        let options = Object.assign({}, SimpleNotification._options, notificationOptions);
         // If there is nothing to close a notification we force the close button
         options.closeButton = (!options.closeOnClick && options.sticky) ? true : options.closeButton;
         // Create the notification
@@ -712,7 +717,7 @@ class SimpleNotification {
 }
 SimpleNotification.wrappers = {};
 SimpleNotification.displayed = [];
-SimpleNotification.default = {
+SimpleNotification._options = {
     position: 'top-right',
     maxNotifications: 0,
     removeAllOnDisplay: false,
