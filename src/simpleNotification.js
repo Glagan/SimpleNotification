@@ -250,7 +250,8 @@ class SimpleNotification {
                 this.close(false);
             } else if (event.animationName == 'insert-left' ||
                 event.animationName == 'insert-right' ||
-                event.animationName == 'insert-bottom') {
+                event.animationName == 'insert-bottom' ||
+                event.animationName == 'insert-top') {
                 this.node.classList.remove('gn-insert');
             }
         });
@@ -468,7 +469,8 @@ class SimpleNotification {
         let startOnInsertFinish = event => {
             if (event.animationName == 'insert-left' ||
                 event.animationName == 'insert-right' ||
-                event.animationName == 'insert-bottom') {
+                event.animationName == 'insert-bottom' ||
+                event.animationName == 'insert-top') {
                 // Set the time before removing the notification
                 this.progressBar.style.animationDuration = [this.duration, 'ms'].join('');
                 if (document.hasFocus()) {
