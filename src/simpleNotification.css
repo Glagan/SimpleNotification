@@ -1,21 +1,3 @@
-@keyframes fadeout {
-    from {
-        opacity: 1;
-    }
-    to {
-        opacity: 0;
-    }
-}
-
-@keyframes shorten {
-    from {
-        width: 100%;
-    }
-    to {
-        width: 0;
-    }
-}
-
 @keyframes insert-left {
     from {
         transform: rotateY(-70deg);
@@ -60,9 +42,71 @@
     }
 }
 
+@keyframes fadein {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes fadeout {
+    from {
+        opacity: 1;
+    }
+    to {
+        opacity: 0;
+    }
+}
+
+@keyframes scalein {
+    from {
+        transform: scale(0);
+    }
+    to {
+        transform: scale(1);
+    }
+}
+
+@keyframes scaleout {
+    from {
+        transform: scale(1);
+    }
+    to {
+        transform: scale(0);
+    }
+}
+
+@keyframes rotatein {
+    from {
+        transform: rotate(0) scale(0);
+    }
+    to {
+        transform: rotate(360deg) scale(1);
+    }
+}
+
+@keyframes rotateout {
+    from {
+        transform: rotate(0) scale(1);
+    }
+    to {
+        transform: rotate(-360deg) scale(0);
+    }
+}
+
+@keyframes shorten {
+    from {
+        width: 100%;
+    }
+    to {
+        width: 0;
+    }
+}
+
 .gn-wrapper {
     position: fixed;
-    overflow: hidden;
     pointer-events: none;
     display: flex;
     flex-direction: column;
@@ -114,9 +158,6 @@
     overflow: hidden;
     margin: 1rem;
     cursor: default;
-    animation-duration: 1000ms;
-    animation-timing-function: cubic-bezier(0.165, 0.84, 0.44, 1);
-    animation-fill-mode: forwards;
     pointer-events: all;
     min-width: 10rem;
     max-width: 25rem;
@@ -125,26 +166,8 @@
 }
 
 .gn-insert {
-    animation-duration: 250ms;
     animation-timing-function: cubic-bezier(0.23, 1, 0.320, 1);
     animation-fill-mode: forwards;
-}
-
-.gn-top-left .gn-insert,
-.gn-bottom-left .gn-insert {
-    animation-name: insert-left;
-}
-
-.gn-top-right .gn-insert,
-.gn-bottom-right .gn-insert {
-    animation-name: insert-right;
-}
-
-.gn-top-center .gn-insert {
-    animation-name: insert-top;
-}
-.gn-bottom-center .gn-insert {
-    animation-name: insert-bottom;
 }
 
 .gn-close-on-click {
@@ -187,10 +210,7 @@
     text-overflow: ellipsis;
     position: relative;
 }
-
-.gn-fadeout {
-    animation-duration: 1000ms;
-    animation-name: fadeout;
+.gn-remove {
     animation-timing-function: linear;
     animation-fill-mode: forwards;
 }

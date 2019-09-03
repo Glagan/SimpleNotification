@@ -177,12 +177,6 @@
                                     <input class="input" type="number" name="duration" id="duration" value="4000" placeholder="Duration (ms)" />
                                 </div>
                             </div>
-                            <div class="column">
-                                <label class="label" for="fadeout">Fadeout duration (ms)</label>
-                                <div class="control">
-                                    <input class="input" type="number" name="fadeout" id="fadeout" value="400" placeholder="Fadeout (ms)" />
-                                </div>
-                            </div>
                         </div>
                         <div class="message is-info">
                             <p class="message-body"><b>Title</b>, <b>Image</b> and <b>Content</b> are all optional, but at least one must be specified.</p>
@@ -287,9 +281,9 @@
                 }, {
                     value: 'Close', type: 'error', onClick: (notification) => {
                         SimpleNotification.message({
-                            title: 'Closing...', text: 'The other notification will close with a fadeout thanks to ``notification.closeFadeout()``.'
+                            title: 'Closing...', text: 'The other notification will close with a fadeout thanks to ``notification.closeAnimated()``.'
                         }, { position: 'bottom-right' });
-                        notification.closeFadeout();
+                        notification.closeAnimated();
                     }
                 }]
             },
@@ -332,7 +326,7 @@
                         notification.removeButtons();
                         notification.setType('message');
                         notification.addButton('error', 'Close', (notification) => {
-                            notification.closeFadeout();
+                            notification.closeAnimated();
                         });
                         notification.setText('You can now click on the button to close this notification.');
                     }
@@ -368,10 +362,12 @@
         let options = {
             position: form.position.value,
             duration: Math.floor(form.duration.value),
-            fadeout: Math.floor(form.fadeout.value),
             sticky: Math.floor(form.sticky.value),
             closeOnClick: Math.floor(form.closeOnClick.value),
             closeButton: Math.floor(form.closeButton.value),
+            removeAnimation: {
+                name: 'rotateout'
+            }
         };
         SimpleNotification[form.type.value]({
             title: form.title.value,
