@@ -172,9 +172,50 @@
                         </div>
                         <div class="field is-grouped">
                             <div class="column">
+                                <label class="label" for="insertAnimationName">Insert Animation</label>
+                                <div class="select">
+                                    <select name="insertAnimationName" id="insertAnimationName">
+                                        <option value="default-insert">default-insert (default)</option> selected
+                                        <option value="insert-left">insert-left</option>
+                                        <option value="insert-top">insert-top</option>
+                                        <option value="insert-right">insert-right</option>
+                                        <option value="insert-left">insert-left</option>
+                                        <option value="fadein">fadein</option>
+                                        <option value="scalein">scalein</option>
+                                        <option value="rotatein">rotatein</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="column">
+                                <label class="label" for="insertAnimationDuration">Insert duration (ms)</label>
+                                <div class="control">
+                                    <input class="input" type="number" name="insertAnimationDuration" id="insertAnimationDuration" value="250" placeholder="Duration (ms)" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="field is-grouped">
+                            <div class="column">
                                 <label class="label" for="duration">Display duration (ms)</label>
                                 <div class="control">
                                     <input class="input" type="number" name="duration" id="duration" value="4000" placeholder="Duration (ms)" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="field is-grouped">
+                            <div class="column">
+                                <label class="label" for="removeAnimationName">Remove Animation</label>
+                                <div class="select">
+                                    <select name="removeAnimationName" id="removeAnimationName">
+                                        <option value="fadeout">fadeout (default)</option> selected
+                                        <option value="scaleout">scaleout</option>
+                                        <option value="rotateout">rotateout</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="column">
+                                <label class="label" for="removeAnimationDuration">Remove duration (ms)</label>
+                                <div class="control">
+                                    <input class="input" type="number" name="removeAnimationDuration" id="removeAnimationDuration" value="400" placeholder="Duration (ms)" />
                                 </div>
                             </div>
                         </div>
@@ -276,13 +317,13 @@
                     value: 'Open', type: 'success', onClick: (notification) => {
                         SimpleNotification.success({
                             title: 'Another One !', text: 'You opened another notification without closing the old one.'
-                        }, { position: 'top-left' })
+                        }, { position: 'top-left', insertAnimation: { name: 'scalein' } })
                     }
                 }, {
                     value: 'Close', type: 'error', onClick: (notification) => {
                         SimpleNotification.message({
                             title: 'Closing...', text: 'The other notification will close with a fadeout thanks to ``notification.closeAnimated()``.'
-                        }, { position: 'bottom-right' });
+                        }, { position: 'bottom-right', insertAnimation: { name: 'rotatein' } });
                         notification.closeAnimated();
                     }
                 }]
@@ -365,8 +406,13 @@
             sticky: Math.floor(form.sticky.value),
             closeOnClick: Math.floor(form.closeOnClick.value),
             closeButton: Math.floor(form.closeButton.value),
+            insertAnimation: {
+                name: form.insertAnimationName.value,
+                duration: Math.floor(form.insertAnimationDuration.value)
+            },
             removeAnimation: {
-                name: 'rotateout'
+                name: form.removeAnimationName.value,
+                duration: Math.floor(form.removeAnimationDuration.value)
             }
         };
         SimpleNotification[form.type.value]({
