@@ -76,13 +76,13 @@ There are four events during the process of displaying every notification:
 
 * ``onCreate(notification)`` called when the notification *node* is created but **empty**.
 * ``onDisplay(notification)`` called when the notification *node* is appended to its wrapper.
-* ``onDeath(notification)`` called when the duration timer has expired.  
+* ``onDeath(notification)`` called when the duration timer has expired.
     * If you set the ``onDeath`` function you need to call ``notification.close()``, ``notification.remove()`` or ``notification.closeFadeout()`` or else the notification won't disappear.
 * ``onDisplay(notification)`` after the notification has been closed.
 
 ## Animations
 
-You can customize the **insert** and **remove** animations of a notification by giving a value to the ``insertAnimation`` (or ``removeAnimation``) option.  
+You can customize the **insert** and **remove** animations of a notification by giving a value to the ``insertAnimation`` (or ``removeAnimation``) option.
 The option take an object like the following:
 
 ```javascript
@@ -92,7 +92,7 @@ The option take an object like the following:
 }
 ```
 
-The **insert** animations are: ``insert-[left|top|right|bottom]``, ``fadein``, ``scalein`` and ``rotatein``.  
+The **insert** animations are: ``insert-[left|top|right|bottom]``, ``fadein``, ``scalein`` and ``rotatein``.
 
 > By default the animation is ``default-insert`` which is a special value that automatically choose the corresponding insert animation after the notification position.
 
@@ -110,8 +110,8 @@ Most of these tags can be nested to combine their effects.
 | Inline code | \`\`code\`\` |
 | Header (h1) | ``# Header 1\n`` |
 | Header (h2) | ``## Header 2\n`` |
-| Link | <code>{{title\|http://www.example.org/}}</code> or ``{{http://www.example.org/}}`` without title. |
-| Image | <code>![title\|http://www.example.org/image.jpg]</code> or ``![http://www.example.org/image.jpg]`` without title. |
+| Link | ``{{title\|http://www.example.org/}}`` or ``{{http://www.example.org/}}`` without title. |
+| Image | ``![title\|http://www.example.org/image.jpg]`` or ``![http://www.example.org/image.jpg]`` without title. |
 | Bold | ``**http://www.example.org/**`` |
 | Italic | ``*http://www.example.org/*`` |
 | Separator | ``\n---\n`` |
