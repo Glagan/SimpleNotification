@@ -2,11 +2,10 @@ class SimpleNotification {
     constructor(options=undefined) {
         this.options = options;
         if (this.options == undefined) {
-            this.options = Object.assign({}, SimpleNotification._options);
+            this.options = SimpleNotification.deepAssign({}, SimpleNotification._options);
         }
         this.events = this.options.events;
         this.node = undefined;
-        this.wrapper = undefined;
         // Content
         this.title = undefined;
         this.closeButton = undefined;
@@ -15,13 +14,21 @@ class SimpleNotification {
         this.text = undefined;
         this.buttons = undefined;
         this.progressBar = undefined;
-        //
-        this.setDuration(this.options.duration);
-        this.setFadeoutTime(this.options.fadeout);
-        this.setPosition(this.options.position);
         // Functions
         this.addExtinguish = this.addExtinguishFct.bind(this);
         this.removeExtinguish = this.removeExtinguishFct.bind(this);
+    }
+
+    static deepAssign(target, ...objs) {
+        for (let i = 0, max = objs.length; i < max; i++) {
+            for (var k in objs[i]) {
+                if (objs[i][k] != null && typeof (objs[i][k]) == 'object')
+                    target[k] = SimpleNotification.deepAssign((target[k]) ? target[k] : {}, objs[i][k]);
+                else
+                    target[k] = objs[i][k];
+            }
+        }
+        return target;
     }
 
     /**
@@ -29,7 +36,7 @@ class SimpleNotification {
      * @param {object} options Options object to override the defaults
      */
     static options(options) {
-        SimpleNotification._options = Object.assign({}, SimpleNotification._options, options);
+        SimpleNotification._options = SimpleNotification.deepAssign({}, SimpleNotification._options, options);
     }
 
     /**
@@ -38,11 +45,9 @@ class SimpleNotification {
      * @param {string} position The position of the wrapper
      */
     static makeWrapper(position) {
-        let fragment = document.createDocumentFragment();
         let wrapper = document.createElement('div');
         wrapper.className = 'gn-wrapper gn-' + position;
-        fragment.appendChild(wrapper);
-        document.body.appendChild(fragment);
+        document.body.appendChild(wrapper);
         SimpleNotification.wrappers[position] = wrapper;
     }
 
@@ -241,20 +246,85 @@ class SimpleNotification {
         this.node = document.createElement('div');
         // Apply Style
         this.node.className = 'gn-notification gn-insert';
+        if (this.options.insertAnimation.name == 'default-insert') {
+            switch (this.options.position) {
+                case 'top-left':
+                case 'bottom-left':
+                    this.options.insertAnimation.name = 'insert-left';
+                    break;
+                case 'top-right':
+                case 'bottom-right':
+                    this.options.insertAnimation.name = 'insert-right';
+                    break;
+                case 'top-center':
+                    this.options.insertAnimation.name = 'insert-top';
+                    break;
+                case 'bottom-center':
+                    this.options.insertAnimation.name = 'insert-bottom';
+                    break;
+            }
+        }
+        if (this.options.insertAnimation.name == this.options.removeAnimation.name) {
+            if (this.options.insertAnimation.name == 'fadeout') {
+                this.options.removeAnimation.name = 'rotateout';
+            } else {
+                this.options.removeAnimation.name = 'fadeout';
+            }
+        }
+        this.node.style.animationName = this.options.insertAnimation.name;
+        this.node.style.animationDuration = [this.options.insertAnimation.duration, 'ms'].join('');
         classes.forEach(className => {
             this.node.classList.add(className);
         });
-        // When fadeout end, remove the node from the wrapper
+        // AnimationEnd listener for the different steps of a notification
         this.node.addEventListener('animationend', event => {
-            if (event.animationName == 'fadeout') {
+            if (event.animationName == this.options.removeAnimation.name) {
                 this.close(false);
-            } else if (event.animationName == 'insert-left' ||
-                event.animationName == 'insert-right' ||
-                event.animationName == 'insert-bottom' ||
-                event.animationName == 'insert-top') {
+            } else if (event.animationName == this.options.insertAnimation.name) {
                 this.node.classList.remove('gn-insert');
+                // Reset notification duration when hovering
+                if (!this.options.sticky) {
+                    this.node.addEventListener('mouseenter', this.removeExtinguish);
+                    this.node.addEventListener('mouseleave', this.addExtinguish);
+                }
+                if (this.progressBar) {
+                    // Set the time before removing the notification
+                    this.progressBar.style.animationDuration = [this.options.duration, 'ms'].join('');
+                    if (document.hasFocus()) {
+                        this.progressBar.classList.add('gn-extinguish');
+                    } else {
+                        // Start the extinguish animation only when the page is focused
+                        let addFocusExtinguish = () => {
+                            this.progressBar.classList.add('gn-extinguish');
+                            document.removeEventListener('focus', addFocusExtinguish);
+                        };
+                        document.addEventListener('focus', addFocusExtinguish);
+                    }
+                }
+            } else if (event.animationName == 'shorten' && this.progressBar) {
+                if (!this.options.sticky) {
+                    this.node.removeEventListener('mouseenter', this.removeExtinguish);
+                    this.node.removeEventListener('mouseleave', this.addExtinguish);
+                }
+                this.progressBar.classList.add('gn-retire');
+                if (this.events.onDeath) {
+                    this.events.onDeath(this);
+                } else {
+                    this.disableButtons();
+                    this.closeAnimated();
+                    // TODO: Add event listener to pause closing
+                }
             }
         });
+        // Delete the notification on click
+        if (this.options.closeOnClick) {
+            this.node.title = 'Click to close.';
+            this.node.classList.add('gn-close-on-click');
+            this.node.addEventListener('click', () => {
+                this.close(true);
+            });
+        }
+        // Fire onCreateEvent
         if (this.events.onCreate) {
             this.events.onCreate(this);
         }
@@ -273,54 +343,6 @@ class SimpleNotification {
                 this.node.classList.add('gn-close-on-click');
             }
         }
-    }
-
-    /**
-     * Set the duration of the notification
-     */
-    setDuration(tm) {
-        this.duration = tm;
-    }
-
-    /**
-     * Set the fadeout time of the notification
-     */
-    setFadeoutTime(tm) {
-        this.fadeoutTime = tm;
-    }
-
-    /**
-     * Set the position of the notification
-     * top-left, top-right, bottom-left, bottom-center, bottom-right
-     */
-    setPosition(position) {
-        // Create wrapper if needed
-        if (!(position in SimpleNotification.wrappers)) {
-            SimpleNotification.makeWrapper(position);
-        }
-        this.wrapper = SimpleNotification.wrappers[position];
-        if (this.node) {
-            this.wrapper.appendChild(this.node);
-        }
-    }
-
-    /**
-     * Add a click event to the whole notification node to close it
-     */
-    addCloseOnClick() {
-        this.node.title = 'Click to close.';
-        this.node.classList.add('gn-close-on-click');
-        this.node.addEventListener('click', () => {
-            this.close(true);
-        });
-    }
-
-    /**
-     * Add the mouseenter and mouseleave events that refresh the notification duration
-     */
-    addStartStop() {
-        this.node.addEventListener('mouseenter', this.removeExtinguish);
-        this.node.addEventListener('mouseleave', this.addExtinguish);
     }
 
     /**
@@ -451,43 +473,6 @@ class SimpleNotification {
     addProgressBar() {
         this.progressBar = document.createElement('span');
         this.progressBar.className = 'gn-lifespan';
-        // Destroy the notification when the animation end
-        let startFadeoutAfterShorten = event => {
-            if (event.animationName == 'shorten') {
-                this.progressBar.removeEventListener('animationend', startFadeoutAfterShorten);
-                this.progressBar.classList.add('gn-retire');
-                if (this.events.onDeath) {
-                    this.events.onDeath(this);
-                } else {
-                    this.disableButtons();
-                    this.closeFadeout();
-                }
-            }
-        };
-        this.progressBar.addEventListener('animationend', startFadeoutAfterShorten);
-        // Put the extinguish in a event listener to start when insert animation is done
-        let startOnInsertFinish = event => {
-            if (event.animationName == 'insert-left' ||
-                event.animationName == 'insert-right' ||
-                event.animationName == 'insert-bottom' ||
-                event.animationName == 'insert-top') {
-                // Set the time before removing the notification
-                this.progressBar.style.animationDuration = [this.duration, 'ms'].join('');
-                if (document.hasFocus()) {
-                    this.progressBar.classList.add('gn-extinguish');
-                } else {
-                    // Start the extinguish animation only when the page is focused
-                    let addFocusExtinguish = () => {
-                        this.progressBar.classList.add('gn-extinguish');
-                        document.removeEventListener('focus', addFocusExtinguish);
-                    };
-                    document.addEventListener('focus', addFocusExtinguish);
-                }
-                // Remove event and style of insert
-                this.node.removeEventListener('animationend', startOnInsertFinish);
-            }
-        };
-        this.node.addEventListener('animationend', startOnInsertFinish);
         this.node.appendChild(this.progressBar);
     }
 
@@ -508,7 +493,10 @@ class SimpleNotification {
                     }
                 }
             }
-            this.wrapper.appendChild(this.node);
+            if (!SimpleNotification.wrappers[this.options.position]) {
+                SimpleNotification.makeWrapper(this.options.position);
+            }
+            SimpleNotification.wrappers[this.options.position].appendChild(this.node);
             SimpleNotification.displayed.push(this);
             if (this.events.onDisplay) {
                 this.events.onDisplay(this);
@@ -542,8 +530,25 @@ class SimpleNotification {
     }
 
     /**
+     * Remove reset events and add the fadeout animation
+     */
+    closeAnimated() {
+        // Add the fadeout animation
+        this.node.classList.add('gn-remove');
+        this.node.style.animationName = this.options.removeAnimation.name;
+        this.node.style.animationDuration = [this.options.removeAnimation.duration, 'ms'].join('');
+        // Pause and reset fadeout on hover
+        this.node.addEventListener('mouseenter', event => {
+            event.target.classList.remove('gn-remove');
+        });
+        this.node.addEventListener('mouseleave', event => {
+            event.target.classList.add('gn-remove');
+        });
+    }
+
+    /**
      * Add the class 'gn-extinguish' to the event target
-     * Used in create() and closeFadeout() to be able to remove the eventListener.
+     * Used in create() and closeAnimated() to be able to remove the eventListener.
      */
     addExtinguishFct() {
         this.progressBar.classList.add('gn-extinguish');
@@ -551,7 +556,7 @@ class SimpleNotification {
 
     /**
      * Remove the class 'gn-extinguish' to the event target
-     * Used in create() and closeFadeout() to be able to remove the eventListener.
+     * Used in create() and closeAnimated() to be able to remove the eventListener.
      */
     removeExtinguishFct() {
         this.progressBar.classList.remove('gn-extinguish');
@@ -566,25 +571,6 @@ class SimpleNotification {
                 this.buttons.childNodes[i].disabled = true;
             }
         }
-    }
-
-    /**
-     * Remove reset events and add the fadeout animation
-     */
-    closeFadeout() {
-        // Remove the timer animation
-        this.node.removeEventListener('mouseenter', this.removeExtinguish);
-        this.node.removeEventListener('mouseleave', this.addExtinguish);
-        // Add the fadeout animation
-        this.node.style.animationDuration = [this.fadeoutTime, 'ms'].join('');
-        this.node.classList.add('gn-fadeout');
-        // Pause and reset fadeout on hover
-        this.node.addEventListener('mouseenter', event => {
-            event.target.classList.remove('gn-fadeout');
-        });
-        this.node.addEventListener('mouseleave', event => {
-            event.target.classList.add('gn-fadeout');
-        });
     }
 
     /**
@@ -603,21 +589,12 @@ class SimpleNotification {
         // Abort if empty
         if (!hasImage && !hasTitle && !hasText && !hasButtons) return;
         // Merge options
-        let options = Object.assign({}, SimpleNotification._options, notificationOptions);
+        let options = SimpleNotification.deepAssign({}, SimpleNotification._options, notificationOptions);
         // If there is nothing to close a notification we force the close button
         options.closeButton = (!options.closeOnClick && options.sticky) ? true : options.closeButton;
         // Create the notification
         let notification = new SimpleNotification(options);
         notification.make(classes);
-        // Events
-        // Delete the notification on click
-        if (options.closeOnClick) {
-            notification.addCloseOnClick();
-        }
-        // Pause on hover if not sticky
-        if (!options.sticky) {
-            notification.addStartStop();
-        }
         // Add elements
         if (hasTitle) {
             notification.setTitle(content.title);
@@ -724,13 +701,20 @@ SimpleNotification._options = {
     closeOnClick: true,
     closeButton: true,
     duration: 4000,
-    fadeout: 400,
     sticky: false,
     events: {
         onCreate: undefined,
         onDisplay: undefined,
         onDeath: undefined,
         onClose: undefined,
+    },
+    insertAnimation: {
+        name: 'default-insert',
+        duration: 250
+    },
+    removeAnimation: {
+        name: 'fadeout',
+        duration: 400
     }
 };
 SimpleNotification.tags = {

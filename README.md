@@ -3,7 +3,7 @@
 *SimpleNotification* is a library to display simple yet customizable notifications. 
 You can stylize text with a simple syntax, add buttons to make the notifications interactable and add callbacks for some events during the life of a notification. 
 
-*SimpleNotification* weighs **10.50 Kb** (**3.50 Kb** gziped), with no dependencies.
+*SimpleNotification* weighs **11.10 Kb** (**3.60 Kb** gziped), with no dependencies.
 
 You can find a live demo here: [https://notification.nikurasu.org/](https://notification.nikurasu.org/)
 
@@ -43,7 +43,7 @@ SimpleNotification.success({
 You can still update the content and state of any notification after it's been created with these functions:
 
 ```
-setPosition(position), setType(type), setTitle(title), setImage(image), setText(text), addButton(button), removeButtons()
+setType(type), setTitle(title), setImage(image), setText(text), addButton(button), removeButtons(), disableButtons()
 ```
 
 You can use custom classes and make your own design by using ``SimpleNotification.custom(classes, content, options)`` where classes is an array of CSS classes that will be added to the body of each notification.
@@ -57,7 +57,6 @@ There are a few options that you can set by using ``SimpleNotification.options(o
 | Name | Description | Default |
 |---|---|---|
 | duration | The time (in ms) that the notification is displayed. | 4000 |
-| fadeout | The duration (in ms) of the fadeout animation when the notification display time is over. | 400 |
 | position | Valid positions: ``top-left``, ``top-center``, ``top-right``, ``bottom-left``, ``bottom-center`` and ``bottom-right``. | top-right |
 | sticky | If true, the notification will not disappear until the user clicks it or its close button. | false |
 | closeButton | If true, a close button will be added either on the title or the content. | true |
@@ -65,6 +64,8 @@ There are a few options that you can set by using ``SimpleNotification.options(o
 | removeAllOnDisplay | If true, all notifications will be cleared before the new one is added to the screen. | false |
 | maxNotifications | If >0, notifications (starting with oldest) will clear out until the number displayed is less than or equal to the specified option. | 0 |
 | events | Object with events functions, see [Events](##Events) |
+| insertAnimation | Object with CSS class name and duration, see [Animations](##Animations) | ``{ name: 'default-insert', duration: 250 }`` |
+| removeAnimation | Object with CSS class name and duration, see [Animations](##Animations) | ``{ name: 'fadeout', duration: 400 }`` |
 | display | Display the notification when creating it. | true |
 
 > If a notification is ``sticky`` and ``closeOnClick`` is disabled, ``closeButton`` is set to true to always have a way to close a notification.
@@ -78,6 +79,26 @@ There are four events during the process of displaying every notification:
 * ``onDeath(notification)`` called when the duration timer has expired.  
     * If you set the ``onDeath`` function you need to call ``notification.close()``, ``notification.remove()`` or ``notification.closeFadeout()`` or else the notification won't disappear.
 * ``onDisplay(notification)`` after the notification has been closed.
+
+## Animations
+
+You can customize the **insert** and **remove** animations of a notification by giving a value to the ``insertAnimation`` (or ``removeAnimation``) option.  
+The option take an object like the following:
+
+```javascript
+{
+    name: "default-insert", // See the list below
+    duration: 250 // In ms
+}
+```
+
+The **insert** animations are: ``insert-[left|top|right|bottom]``, ``fadein``, ``scalein`` and ``rotatein``.  
+
+> By default the animation is ``default-insert`` which is a special value that automatically choose the corresponding insert animation after the notification position.
+
+The **remove** animations are: ``fadeout``, ``scaleout`` and ``rotateout``.
+
+You can add your own animations by adding them in your own CSS files and setting the name of the animation as the parameter.
 
 ## Markdown-*like* tags
 
