@@ -57,7 +57,7 @@ There are a few options that you can set by using ``SimpleNotification.options(o
 | Name | Description | Default |
 |---|---|---|
 | duration | The time (in ms) that the notification is displayed. | 4000 |
-| position | Valid positions: ``top-left``, ``top-center``, ``top-right``, ``bottom-left``, ``bottom-center`` and ``bottom-right``. | top-right |
+| position | Valid positions: ``top-left``, ``top-center``, ``top-right``, ``bottom-left``, ``bottom-center`` and ``bottom-right``. | "top-right" |
 | sticky | If true, the notification will not disappear until the user clicks it or its close button. | false |
 | closeButton | If true, a close button will be added either on the title or the content. | true |
 | closeOnClick | If true, clicking anywhere in the notification will close it. | true |
