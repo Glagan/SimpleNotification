@@ -3,7 +3,7 @@
 *SimpleNotification* is a library to display simple yet customizable notifications. 
 You can stylize text with a simple syntax, add buttons to make the notifications interactable and add callbacks for some events during the life of a notification. 
 
-*SimpleNotification* weighs **11.10 Kb** (**3.60 Kb** gziped), with no dependencies.
+*SimpleNotification* weighs **11.10 Kb** (**3.60 Kb** gzipped), with no dependencies.
 
 You can find a live demo here: [https://notification.nikurasu.org/](https://notification.nikurasu.org/)
 
@@ -63,9 +63,9 @@ There are a few options that you can set by using ``SimpleNotification.options(o
 | closeOnClick | If true, clicking anywhere in the notification will close it. | true |
 | removeAllOnDisplay | If true, all notifications will be cleared before the new one is added to the screen. | false |
 | maxNotifications | If >0, notifications (starting with oldest) will clear out until the number displayed is less than or equal to the specified option. | 0 |
-| events | Object with events functions, see [Events](##Events) |
-| insertAnimation | Object with CSS class name and duration, see [Animations](##Animations) | ``{ name: 'default-insert', duration: 250 }`` |
-| removeAnimation | Object with CSS class name and duration, see [Animations](##Animations) | ``{ name: 'fadeout', duration: 400 }`` |
+| events | Object with events functions, see [Events](#Events). |
+| insertAnimation | Object with CSS class name and duration, see [Animations](#Animations). | ``{ name: 'default-insert', duration: 250 }`` |
+| removeAnimation | Object with CSS class name and duration, see [Animations](#Animations). | ``{ name: 'fadeout', duration: 400 }`` |
 | display | Display the notification when creating it. | true |
 
 > If a notification is ``sticky`` and ``closeOnClick`` is disabled, ``closeButton`` is set to true to always have a way to close a notification.
