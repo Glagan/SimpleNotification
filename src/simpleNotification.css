@@ -110,7 +110,7 @@
     pointer-events: none;
     display: flex;
     flex-direction: column;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
     z-index: 1080;
     top: 0;
     left: 0;
@@ -146,6 +146,7 @@
 }
 
 .gn-notification {
+    flex-shrink: 0;
     font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
     box-shadow: 1px 1px 3px black;
     border-radius: 3px;
