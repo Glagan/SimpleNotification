@@ -112,43 +112,37 @@
     flex-direction: column;
     flex-wrap: wrap;
     z-index: 1080;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
 }
 
 .gn-top-right,
 .gn-bottom-right {
     align-items: flex-end;
 }
+.gn-bottom-right {
+    justify-content: flex-end;
+}
 
 .gn-top-left,
 .gn-bottom-left {
     align-items: flex-start;
 }
+.gn-bottom-left {
+    justify-content: flex-end;
+}
 
-.gn-top-right {
-    top: 0;
-    right: 0;
+.gn-top-center,
+.gn-bottom-center {
+    align-items: center;
 }
 .gn-top-center {
-    top: 0;
-    left: 50%;
-    transform: translateX(-50%);
-}
-.gn-top-left {
-    top: 0;
-    left: 0;
-}
-.gn-bottom-left {
-    bottom: 0;
-    left: 0;
+    justify-content: flex-start;
 }
 .gn-bottom-center {
-    top: 100%;
-    left: 50%;
-    transform: translateX(-50%) translateY(-100%);
-}
-.gn-bottom-right {
-    bottom: 0;
-    right: 0;
+    justify-content: flex-end;
 }
 
 .gn-notification {
