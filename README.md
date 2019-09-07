@@ -3,7 +3,7 @@
 *SimpleNotification* is a library to display simple yet customizable notifications. 
 You can stylize text with a simple syntax, add buttons to make the notifications interactable and add callbacks for some events during the life of a notification. 
 
-*SimpleNotification* weighs **11.10 Kb** (**3.60 Kb** gziped), with no dependencies.
+*SimpleNotification* weighs **11.10 Kb** (**3.60 Kb** gzipped), with no dependencies.
 
 You can find a live demo here: [https://notification.nikurasu.org/](https://notification.nikurasu.org/)
 
@@ -57,15 +57,15 @@ There are a few options that you can set by using ``SimpleNotification.options(o
 | Name | Description | Default |
 |---|---|---|
 | duration | The time (in ms) that the notification is displayed. | 4000 |
-| position | Valid positions: ``top-left``, ``top-center``, ``top-right``, ``bottom-left``, ``bottom-center`` and ``bottom-right``. | top-right |
+| position | Valid positions: ``top-left``, ``top-center``, ``top-right``, ``bottom-left``, ``bottom-center`` and ``bottom-right``. | "top-right" |
 | sticky | If true, the notification will not disappear until the user clicks it or its close button. | false |
 | closeButton | If true, a close button will be added either on the title or the content. | true |
 | closeOnClick | If true, clicking anywhere in the notification will close it. | true |
 | removeAllOnDisplay | If true, all notifications will be cleared before the new one is added to the screen. | false |
 | maxNotifications | If >0, notifications (starting with oldest) will clear out until the number displayed is less than or equal to the specified option. | 0 |
-| events | Object with events functions, see [Events](##Events) |
-| insertAnimation | Object with CSS class name and duration, see [Animations](##Animations) | ``{ name: 'default-insert', duration: 250 }`` |
-| removeAnimation | Object with CSS class name and duration, see [Animations](##Animations) | ``{ name: 'fadeout', duration: 400 }`` |
+| events | Object with events functions, see [Events](#Events). |
+| insertAnimation | Object with CSS class name and duration, see [Animations](#Animations). | ``{ name: 'default-insert', duration: 250 }`` |
+| removeAnimation | Object with CSS class name and duration, see [Animations](#Animations). | ``{ name: 'fadeout', duration: 400 }`` |
 | display | Display the notification when creating it. | true |
 
 > If a notification is ``sticky`` and ``closeOnClick`` is disabled, ``closeButton`` is set to true to always have a way to close a notification.
@@ -76,13 +76,13 @@ There are four events during the process of displaying every notification:
 
 * ``onCreate(notification)`` called when the notification *node* is created but **empty**.
 * ``onDisplay(notification)`` called when the notification *node* is appended to its wrapper.
-* ``onDeath(notification)`` called when the duration timer has expired.  
+* ``onDeath(notification)`` called when the duration timer has expired.
     * If you set the ``onDeath`` function you need to call ``notification.close()``, ``notification.remove()`` or ``notification.closeFadeout()`` or else the notification won't disappear.
 * ``onDisplay(notification)`` after the notification has been closed.
 
 ## Animations
 
-You can customize the **insert** and **remove** animations of a notification by giving a value to the ``insertAnimation`` (or ``removeAnimation``) option.  
+You can customize the **insert** and **remove** animations of a notification by giving a value to the ``insertAnimation`` (or ``removeAnimation``) option.
 The option take an object like the following:
 
 ```javascript
@@ -92,7 +92,7 @@ The option take an object like the following:
 }
 ```
 
-The **insert** animations are: ``insert-[left|top|right|bottom]``, ``fadein``, ``scalein`` and ``rotatein``.  
+The **insert** animations are: ``insert-[left|top|right|bottom]``, ``fadein``, ``scalein`` and ``rotatein``.
 
 > By default the animation is ``default-insert`` which is a special value that automatically choose the corresponding insert animation after the notification position.
 
@@ -110,8 +110,8 @@ Most of these tags can be nested to combine their effects.
 | Inline code | \`\`code\`\` |
 | Header (h1) | ``# Header 1\n`` |
 | Header (h2) | ``## Header 2\n`` |
-| Link | <code>{{title\|http://www.example.org/}}</code> or ``{{http://www.example.org/}}`` without title. |
-| Image | <code>![title\|http://www.example.org/image.jpg]</code> or ``![http://www.example.org/image.jpg]`` without title. |
+| Link | ``{{title\|http://www.example.org/}}`` or ``{{http://www.example.org/}}`` without title. |
+| Image | ``![title\|http://www.example.org/image.jpg]`` or ``![http://www.example.org/image.jpg]`` without title. |
 | Bold | ``**http://www.example.org/**`` |
 | Italic | ``*http://www.example.org/*`` |
 | Separator | ``\n---\n`` |
