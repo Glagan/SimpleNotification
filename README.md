@@ -3,7 +3,7 @@
 *SimpleNotification* is a library to display simple yet customizable notifications. 
 You can stylize text with a simple syntax, add buttons to make the notifications interactable and add callbacks for some events during the life of a notification. 
 
-*SimpleNotification* weighs **11.10 Kb** (**3.60 Kb** gzipped), with no dependencies.
+*SimpleNotification* weighs **11.12 Kb** (**3.57 Kb** gzipped), with no dependencies.
 
 You can find a live demo here: [https://notification.nikurasu.org/](https://notification.nikurasu.org/)
 
@@ -18,7 +18,9 @@ You can call each of the templates by their name directly on ``SimpleNotificatio
 
 The five templates are ``success``, ``error``, ``info``, ``warning`` and ``message``.
 
-![Success notification](screenshots/success.png)
+<p align="center">
+    <img width="320" height="92" src="screenshots/success.png">
+</p>
 
 ```javascript
 SimpleNotification.success({
@@ -81,6 +83,10 @@ There are four events during the process of displaying every notification:
 * ``onDisplay(notification)`` after the notification has been closed.
 
 ## Animations
+
+<p align="center">
+    <img width="320" height="92" src="screenshots/success.png">
+</p>
 
 You can customize the **insert** and **remove** animations of a notification by giving a value to the ``insertAnimation`` (or ``removeAnimation``) option.
 The option take an object like the following:

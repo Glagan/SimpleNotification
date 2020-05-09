@@ -1,426 +1,448 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Glagan/SimpleNotification</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.4/css/bulma.min.css">
-    <link rel="stylesheet" type="text/css" media="screen" href="src/simpleNotification.css" />
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-        }
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<title>Glagan/SimpleNotification</title>
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.4/css/bulma.min.css">
+	<link rel="stylesheet" type="text/css" media="screen" href="src/simpleNotification.css" />
+	<style>
+		* {
+			margin: 0;
+			padding: 0;
+		}
 
-        html, body {
-            min-height: 100vh;
-            background-color: #252F38;
-            overflow-x: hidden;
-            overflow-y: auto;
-        }
+		html,
+		body {
+			min-height: 100vh;
+			background-color: #252F38;
+			overflow-x: hidden;
+			overflow-y: auto;
+		}
 
-        body {
-            color: white;
-            text-shadow: 0 1px 1px black;
-        }
-        body .title {
-            color: white;
-        }
+		body {
+			color: white;
+			text-shadow: 0 1px 1px black;
+		}
 
-        a:hover {
-            color: white;
-        }
+		body .title {
+			color: white;
+		}
 
-        .corner-4, .custom {
-            border-radius: 4px;
-            border: 2px solid #4F6372;
-            background-color: #3E4E5B;
-        }
+		a:hover {
+			color: white;
+		}
 
-        .corner-4 {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: space-between;
-            margin-bottom: 0.75rem;
-        }
+		.corner-4,
+		.custom {
+			border-radius: 4px;
+			border: 2px solid #4F6372;
+			background-color: #3E4E5B;
+		}
 
-        .corner-4 > div {
-            max-width: 50%;
-            flex: 0 0 50%;
-        }
+		.corner-4 {
+			display: flex;
+			flex-wrap: wrap;
+			justify-content: space-between;
+			margin-bottom: 0.75rem;
+		}
 
-        .columns {
-            margin-top: 0;
-        }
+		.corner-4>div {
+			max-width: 50%;
+			flex: 0 0 50%;
+		}
 
-        .label {
-            color: white;
-        }
+		.columns {
+			margin-top: 0;
+		}
 
-        .message {
-            text-shadow: none;
-        }
+		.label {
+			color: white;
+		}
 
-        /* Custom */
-        .gn-cs-under {
-            text-decoration: underline;
-        }
-        .gn-custom {
-            background-color: pink;
-            color: black;
-            text-shadow: 0 1px 1px white;
-        }
-    </style>
+		.message {
+			text-shadow: none;
+		}
+
+		/* Custom */
+		.gn-cs-under {
+			text-decoration: underline;
+		}
+
+		.gn-custom {
+			background-color: pink;
+			color: black;
+			text-shadow: 0 1px 1px white;
+		}
+	</style>
 </head>
+
 <body>
-    <div class="columns is-centered">
-        <div class="column is-three-fifths">
-            <div class="columns">
-                <div class="column search">
-                    <h1 class="title is-2"><a href="https://github.com/Glagan/SimpleNotification">Glagan/SimpleNotification</a></h1>
-                </div>
-            </div>
-            <div class="columns corner-4">
-                <div class="column is-half">
-                    <button data-position="top-left" data-type="success" class="button is-success">Success</button>
-                    <button data-position="top-left" data-type="info" class="button is-info">Info</button>
-                    <button data-position="top-left" data-type="error" class="button is-danger">Error</button><br>
-                    <button data-position="top-left" data-type="warning" class="button is-warning">Warning</button>
-                    <button data-position="top-left" data-type="message" class="button is-dark">Message</button>
-                    <button data-position="top-left" data-type="custom" class="button is-custom">Custom</button>
-                </div>
-                <div class="column has-text-right is-half">
-                    <button data-position="top-right" data-type="success" class="button is-success">Success</button>
-                    <button data-position="top-right" data-type="info" class="button is-info">Info</button>
-                    <button data-position="top-right" data-type="error" class="button is-danger">Error</button><br>
-                    <button data-position="top-right" data-type="warning" class="button is-warning">Warning</button>
-                    <button data-position="top-right" data-type="message" class="button is-dark">Message</button>
-                    <button data-position="top-right" data-type="custom" class="button is-custom">Custom</button>
-                </div>
-                <div class="column is-half">
-                    <button data-position="bottom-left" data-type="success" class="button is-success">Success</button>
-                    <button data-position="bottom-left" data-type="info" class="button is-info">Info</button>
-                    <button data-position="bottom-left" data-type="error" class="button is-danger">Error</button><br>
-                    <button data-position="bottom-left" data-type="warning" class="button is-warning">Warning</button>
-                    <button data-position="bottom-left" data-type="message" class="button is-dark">Message</button>
-                    <button data-position="bottom-left" data-type="custom" class="button is-custom">Custom</button>
-                </div>
-                <div class="column has-text-right is-half">
-                    <button data-position="bottom-right" data-type="success" class="button is-success">Success</button>
-                    <button data-position="bottom-right" data-type="info" class="button is-info">Info</button>
-                    <button data-position="bottom-right" data-type="error" class="button is-danger">Error</button><br>
-                    <button data-position="bottom-right" data-type="warning" class="button is-warning">Warning</button>
-                    <button data-position="bottom-right" data-type="message" class="button is-dark">Message</button>
-                    <button data-position="bottom-right" data-type="custom" class="button is-custom">Custom</button>
-                </div>
-            </div>
-            <div class="columns">
-                <div class="column custom">
-                    <h2 class="title is-2">Custom Notification</h2>
-                    <p>Use this form to customize all properties of a notification.</p>
-                    <form id="custom">
-                        <div class="field is-grouped">
-                            <div class="columns is-touch">
-                                <div class="column">
-                                    <label class="label" for="type">Type</label>
-                                    <div class="select">
-                                        <select name="type" id="type">
-                                            <option value="success" selected>Success</option>
-                                            <option value="info">Information</option>
-                                            <option value="error">Error</option>
-                                            <option value="warning">Warning</option>
-                                            <option value="message">Message</option>
-                                        </select>
-                                    </div>
-                                </div>
-                                <div class="column">
-                                    <label class="label" for="position">Position</label>
-                                    <div class="select">
-                                        <select name="position" id="position">
-                                            <option value="top-left">top-left</option>
-                                            <option value="top-center">top-center</option>
-                                            <option value="top-right" selected>top-right (default)</option>
-                                            <option value="bottom-left">bottom-left</option>
-                                            <option value="bottom-center">bottom-center</option>
-                                            <option value="bottom-right">bottom-right</option>
-                                        </select>
-                                    </div>
-                                </div>
-                                <div class="column">
-                                    <label class="label">Sticky</label>
-                                    <div class="control">
-                                        <label class="radio"><input type="radio" name="sticky" name="sticky" value="0" checked> No</label>
-                                        <label class="radio"><input type="radio" name="sticky" name="sticky" value="1"> Yes</label>
-                                    </div>
-                                </div>
-                                <div class="column">
-                                    <label class="label">Close Button</label>
-                                    <div class="control">
-                                        <label class="radio"><input type="radio" name="closeButton" name="closeButton" value="0" checked> No</label>
-                                        <label class="radio"><input type="radio" name="closeButton" name="closeButton" value="1"> Yes</label>
-                                    </div>
-                                </div>
-                                <div class="column">
-                                    <label class="label">Close on Click</label>
-                                    <div class="control">
-                                        <label class="radio"><input type="radio" name="closeOnClick" name="closeOnClick" value="0"> No</label>
-                                        <label class="radio"><input type="radio" name="closeOnClick" name="closeOnClick" value="1" checked> Yes</label>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="field is-grouped">
-                            <div class="column">
-                                <label class="label" for="insertAnimationName">Insert Animation</label>
-                                <div class="select">
-                                    <select name="insertAnimationName" id="insertAnimationName">
-                                        <option value="default-insert">default-insert (default)</option> selected
-                                        <option value="insert-left">insert-left</option>
-                                        <option value="insert-top">insert-top</option>
-                                        <option value="insert-right">insert-right</option>
-                                        <option value="insert-left">insert-left</option>
-                                        <option value="fadein">fadein</option>
-                                        <option value="scalein">scalein</option>
-                                        <option value="rotatein">rotatein</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="column">
-                                <label class="label" for="insertAnimationDuration">Insert duration (ms)</label>
-                                <div class="control">
-                                    <input class="input" type="number" name="insertAnimationDuration" id="insertAnimationDuration" value="250" placeholder="Duration (ms)" />
-                                </div>
-                            </div>
-                        </div>
-                        <div class="field is-grouped">
-                            <div class="column">
-                                <label class="label" for="duration">Display duration (ms)</label>
-                                <div class="control">
-                                    <input class="input" type="number" name="duration" id="duration" value="4000" placeholder="Duration (ms)" />
-                                </div>
-                            </div>
-                        </div>
-                        <div class="field is-grouped">
-                            <div class="column">
-                                <label class="label" for="removeAnimationName">Remove Animation</label>
-                                <div class="select">
-                                    <select name="removeAnimationName" id="removeAnimationName">
-                                        <option value="fadeout">fadeout (default)</option> selected
-                                        <option value="scaleout">scaleout</option>
-                                        <option value="rotateout">rotateout</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="column">
-                                <label class="label" for="removeAnimationDuration">Remove duration (ms)</label>
-                                <div class="control">
-                                    <input class="input" type="number" name="removeAnimationDuration" id="removeAnimationDuration" value="400" placeholder="Duration (ms)" />
-                                </div>
-                            </div>
-                        </div>
-                        <div class="message is-info">
-                            <p class="message-body"><b>Title</b>, <b>Image</b> and <b>Content</b> are all optional, but at least one must be specified.</p>
-                        </div>
-                        <div class="field is-grouped">
-                            <div class="column">
-                                <label class="label" for="title">Title</label>
-                                <div class="control">
-                                    <input class="input" type="text" name="title" id="title" class="long" value="Title" placeholder="Title" />
-                                </div>
-                            </div>
-                            <div class="column">
-                                <label class="label" for="image">Image</label>
-                                <div class="control">
-                                    <input class="input" type="text" name="image" id="image" class="long" placeholder="Image" />
-                                </div>
-                            </div>
-                        </div>
-                        <div class="field">
-                            <div class="column">
-                                <label class="label" for="text">Content</label>
-                                <div class="control">
-                                    <textarea class="textarea" name="text" id="text" class="long" value="Content" placeholder="Notification content"></textarea>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="field is-pulled-right">
-                            <button type="submit" class="button is-success">Show</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-    <script src="src/simpleNotification.js"></script>
-    <script>
-    // Add Tag
-    SimpleNotification.addTag('under', {
-        type: 'span',
-        class: 'gn-cs-under',
-        open: '__', close: '__'
-    });
-    // Data
-    let notifications = [
-        {
-            content: {
-                title: 'Title', text: 'Content'
-            },
-            options: {}
-        },
-        {
-            content: {
-                title: 'Multi-line', text: 'Can be multi-line using ``\\r``, ``\\r\\n`` or ``\\n``.\nLike this.'
-            },
-            options: {}
-        },
-        {
-            content: {
-                title: 'With Style !', text: 'Text can be *styled* **easily**, contain {{links|https://notification.nikurasu.org/}} and even ``code`` !'
-            },
-            options: {}
-        },
-        {
-            content: {
-                text: 'This notification doesn\'t have a title ! Crazy !'
-            },
-            options: {}
-        },
-        {
-            content: {
-                title: 'Headers', text: '# First Header\n## *Second* header\n'
-            },
-            options: {}
-        },
-        {
-            content: {
-                title: 'Forest', image: 'https://www.publicdomainpictures.net/pictures/100000/velka/forest-1411400424AOk.jpg'
-            },
-            options: {}
-        },
-        {
-            content: {
-                title: 'Custom Tags', text: 'You can also easily __add__ your own style with ``SimpleNotification.addTag()``.\nSee {{!https://github.com/Glagan/SimpleNotification#text-tag}} to know how.'
-            },
-            options: {}
-        },
-        {
-            content: {
-                title: 'Image and Separator', text: '![You can also have other images|https://oauth.net/images/code/javascript.png]\n---\nAnd you can separate content.'
-            },
-            options: {}
-        },
-        {
-            content: {
-                text: 'You have to choose an action to close this notification',
-                buttons: [{
-                    value: 'Open', type: 'success', onClick: (notification) => {
-                        SimpleNotification.success({
-                            title: 'Another One !', text: 'You opened another notification without closing the old one.'
-                        }, { position: 'top-left', insertAnimation: { name: 'scalein' } })
-                    }
-                }, {
-                    value: 'Close', type: 'error', onClick: (notification) => {
-                        SimpleNotification.message({
-                            title: 'Closing...', text: 'The other notification will close with a fadeout thanks to ``notification.closeAnimated()``.'
-                        }, { position: 'bottom-right', insertAnimation: { name: 'rotatein' } });
-                        notification.closeAnimated();
-                    }
-                }]
-            },
-            options: { sticky: true, closeOnClick: false }
-        },
-        {
-            content: {
-                title: 'Click fast', text: 'You have to be fast to click the button on this one.',
-                buttons: [{
-                    value: 'Click me', type: 'info', onClick: (notification) => {
-                        SimpleNotification.success({
-                            title: 'Nice', text: 'You did it **:)**'
-                        }, { position: 'top-left' });
-                        notification.close();
-                    }
-                }]
-            },
-            options: { duration: 1000,
-                events: {
-                    onDeath: (notification) => {
-                        notification.disableButtons();
-                        notification.setType('info');
-                        notification.buttons.childNodes[0].textContent = 'Disabled';
-                        notification.setTitle('Gotta go faster');
-                        notification.setText('Buttons can be **disabled** after the timer expired.\nYou can also choose to hide the notification, or change a lot of it\'s content.');
-                    }
-                }
-            }
-        },
-        {
-            content: {
-                title: 'Modify after death', text: 'This notification will be updated after it\'s *death* with nice buttons.\nLet it die to see it.',
-            },
-            options: {
-                closeOnClick: false,
-                duration: 2000,
-                events: {
-                    onDeath: (notification) => {
-                        notification.events.onDeath = undefined;
-                        notification.removeButtons();
-                        notification.setType('message');
-                        notification.addButton('error', 'Close', (notification) => {
-                            notification.closeAnimated();
-                        });
-                        notification.setText('You can now click on the button to close this notification.');
-                    }
-                }
-            }
-        },
-    ];
-    let current = 0;
-    let max = notifications.length;
-    // Make buttons show notifications
-    document.querySelectorAll("[data-position]").forEach(button => {
-        button.addEventListener("click", event => {
-            notifications[current].options.position = event.target.dataset.position;
-            if (event.target.dataset.type == 'custom') {
-                SimpleNotification.custom(
-                    ["gn-custom"],
-                    notifications[current].content,
-                    notifications[current].options
-                );
-            } else {
-                SimpleNotification[event.target.dataset.type](
-                    notifications[current].content,
-                    notifications[current].options
-                );
-            }
-            current = (current+1)%max;
-        });
-    })
-    // Notification Creator
-    document.getElementById("custom").addEventListener("submit", event => {
-        event.preventDefault();
-        let form = event.target;
-        let options = {
-            position: form.position.value,
-            duration: Math.floor(form.duration.value),
-            sticky: Math.floor(form.sticky.value),
-            closeOnClick: Math.floor(form.closeOnClick.value),
-            closeButton: Math.floor(form.closeButton.value),
-            insertAnimation: {
-                name: form.insertAnimationName.value,
-                duration: Math.floor(form.insertAnimationDuration.value)
-            },
-            removeAnimation: {
-                name: form.removeAnimationName.value,
-                duration: Math.floor(form.removeAnimationDuration.value)
-            }
-        };
-        SimpleNotification[form.type.value]({
-            title: form.title.value,
-            text: form.text.value,
-            image: form.image.value
-        }, options);
-    });
-    </script>
+	<div class="columns is-centered">
+		<div class="column is-three-fifths">
+			<div class="columns">
+				<div class="column search">
+					<h1 class="title is-2"><a
+							href="https://github.com/Glagan/SimpleNotification">Glagan/SimpleNotification</a></h1>
+				</div>
+			</div>
+			<div class="columns corner-4">
+				<div class="column is-half">
+					<button data-position="top-left" data-type="success" class="button is-success">Success</button>
+					<button data-position="top-left" data-type="info" class="button is-info">Info</button>
+					<button data-position="top-left" data-type="error" class="button is-danger">Error</button><br>
+					<button data-position="top-left" data-type="warning" class="button is-warning">Warning</button>
+					<button data-position="top-left" data-type="message" class="button is-dark">Message</button>
+					<button data-position="top-left" data-type="custom" class="button is-custom">Custom</button>
+				</div>
+				<div class="column has-text-right is-half">
+					<button data-position="top-right" data-type="success" class="button is-success">Success</button>
+					<button data-position="top-right" data-type="info" class="button is-info">Info</button>
+					<button data-position="top-right" data-type="error" class="button is-danger">Error</button><br>
+					<button data-position="top-right" data-type="warning" class="button is-warning">Warning</button>
+					<button data-position="top-right" data-type="message" class="button is-dark">Message</button>
+					<button data-position="top-right" data-type="custom" class="button is-custom">Custom</button>
+				</div>
+				<div class="column is-half">
+					<button data-position="bottom-left" data-type="success" class="button is-success">Success</button>
+					<button data-position="bottom-left" data-type="info" class="button is-info">Info</button>
+					<button data-position="bottom-left" data-type="error" class="button is-danger">Error</button><br>
+					<button data-position="bottom-left" data-type="warning" class="button is-warning">Warning</button>
+					<button data-position="bottom-left" data-type="message" class="button is-dark">Message</button>
+					<button data-position="bottom-left" data-type="custom" class="button is-custom">Custom</button>
+				</div>
+				<div class="column has-text-right is-half">
+					<button data-position="bottom-right" data-type="success" class="button is-success">Success</button>
+					<button data-position="bottom-right" data-type="info" class="button is-info">Info</button>
+					<button data-position="bottom-right" data-type="error" class="button is-danger">Error</button><br>
+					<button data-position="bottom-right" data-type="warning" class="button is-warning">Warning</button>
+					<button data-position="bottom-right" data-type="message" class="button is-dark">Message</button>
+					<button data-position="bottom-right" data-type="custom" class="button is-custom">Custom</button>
+				</div>
+			</div>
+			<div class="columns">
+				<div class="column custom">
+					<h2 class="title is-2">Custom Notification</h2>
+					<p>Use this form to customize all properties of a notification.</p>
+					<form id="custom">
+						<div class="field is-grouped">
+							<div class="columns is-touch">
+								<div class="column">
+									<label class="label" for="type">Type</label>
+									<div class="select">
+										<select name="type" id="type">
+											<option value="success" selected>Success</option>
+											<option value="info">Information</option>
+											<option value="error">Error</option>
+											<option value="warning">Warning</option>
+											<option value="message">Message</option>
+										</select>
+									</div>
+								</div>
+								<div class="column">
+									<label class="label" for="position">Position</label>
+									<div class="select">
+										<select name="position" id="position">
+											<option value="top-left">top-left</option>
+											<option value="top-center">top-center</option>
+											<option value="top-right" selected>top-right (default)</option>
+											<option value="bottom-left">bottom-left</option>
+											<option value="bottom-center">bottom-center</option>
+											<option value="bottom-right">bottom-right</option>
+										</select>
+									</div>
+								</div>
+								<div class="column">
+									<label class="label">Sticky</label>
+									<div class="control">
+										<label class="radio"><input type="radio" name="sticky" name="sticky" value="0"
+												checked> No</label>
+										<label class="radio"><input type="radio" name="sticky" name="sticky" value="1">
+											Yes</label>
+									</div>
+								</div>
+								<div class="column">
+									<label class="label">Close Button</label>
+									<div class="control">
+										<label class="radio"><input type="radio" name="closeButton" name="closeButton"
+												value="0" checked> No</label>
+										<label class="radio"><input type="radio" name="closeButton" name="closeButton"
+												value="1"> Yes</label>
+									</div>
+								</div>
+								<div class="column">
+									<label class="label">Close on Click</label>
+									<div class="control">
+										<label class="radio"><input type="radio" name="closeOnClick" name="closeOnClick"
+												value="0"> No</label>
+										<label class="radio"><input type="radio" name="closeOnClick" name="closeOnClick"
+												value="1" checked> Yes</label>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="field is-grouped">
+							<div class="column">
+								<label class="label" for="insertAnimationName">Insert Animation</label>
+								<div class="select">
+									<select name="insertAnimationName" id="insertAnimationName">
+										<option value="default-insert">default-insert (default)</option> selected
+										<option value="insert-left">insert-left</option>
+										<option value="insert-top">insert-top</option>
+										<option value="insert-right">insert-right</option>
+										<option value="insert-left">insert-left</option>
+										<option value="fadein">fadein</option>
+										<option value="scalein">scalein</option>
+										<option value="rotatein">rotatein</option>
+									</select>
+								</div>
+							</div>
+							<div class="column">
+								<label class="label" for="insertAnimationDuration">Insert duration (ms)</label>
+								<div class="control">
+									<input class="input" type="number" name="insertAnimationDuration"
+										id="insertAnimationDuration" value="250" placeholder="Duration (ms)" />
+								</div>
+							</div>
+						</div>
+						<div class="field is-grouped">
+							<div class="column">
+								<label class="label" for="duration">Display duration (ms)</label>
+								<div class="control">
+									<input class="input" type="number" name="duration" id="duration" value="4000"
+										placeholder="Duration (ms)" />
+								</div>
+							</div>
+						</div>
+						<div class="field is-grouped">
+							<div class="column">
+								<label class="label" for="removeAnimationName">Remove Animation</label>
+								<div class="select">
+									<select name="removeAnimationName" id="removeAnimationName">
+										<option value="fadeout">fadeout (default)</option> selected
+										<option value="scaleout">scaleout</option>
+										<option value="rotateout">rotateout</option>
+									</select>
+								</div>
+							</div>
+							<div class="column">
+								<label class="label" for="removeAnimationDuration">Remove duration (ms)</label>
+								<div class="control">
+									<input class="input" type="number" name="removeAnimationDuration"
+										id="removeAnimationDuration" value="400" placeholder="Duration (ms)" />
+								</div>
+							</div>
+						</div>
+						<div class="message is-info">
+							<p class="message-body"><b>Title</b>, <b>Image</b> and <b>Content</b> are all optional, but
+								at least one must be specified.</p>
+						</div>
+						<div class="field is-grouped">
+							<div class="column">
+								<label class="label" for="title">Title</label>
+								<div class="control">
+									<input class="input" type="text" name="title" id="title" class="long" value="Title"
+										placeholder="Title" />
+								</div>
+							</div>
+							<div class="column">
+								<label class="label" for="image">Image</label>
+								<div class="control">
+									<input class="input" type="text" name="image" id="image" class="long"
+										placeholder="Image" />
+								</div>
+							</div>
+						</div>
+						<div class="field">
+							<div class="column">
+								<label class="label" for="text">Content</label>
+								<div class="control">
+									<textarea class="textarea" name="text" id="text" class="long" value="Content"
+										placeholder="Notification content"></textarea>
+								</div>
+							</div>
+						</div>
+						<div class="field is-pulled-right">
+							<button type="submit" class="button is-success">Show</button>
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+	<script src="src/simpleNotification.js"></script>
+	<script>
+		// Add Tag
+		SimpleNotification.addTag('under', {
+			type: 'span',
+			class: 'gn-cs-under',
+			open: '__', close: '__'
+		});
+		// Data
+		let notifications = [
+			{
+				content: {
+					title: 'Title', text: 'Content'
+				},
+				options: {}
+			},
+			{
+				content: {
+					title: 'Multi-line', text: 'Can be multi-line using ``\\r``, ``\\r\\n`` or ``\\n``.\nLike this.'
+				},
+				options: {}
+			},
+			{
+				content: {
+					title: 'With Style !', text: 'Text can be *styled* **easily**, contain {{links|https://notification.nikurasu.org/}} and even ``code`` !'
+				},
+				options: {}
+			},
+			{
+				content: {
+					text: 'This notification doesn\'t have a title ! Crazy !'
+				},
+				options: {}
+			},
+			{
+				content: {
+					title: 'Headers', text: '# First Header\n## *Second* header\n'
+				},
+				options: {}
+			},
+			{
+				content: {
+					title: 'Forest', image: 'https://www.publicdomainpictures.net/pictures/100000/velka/forest-1411400424AOk.jpg'
+				},
+				options: {}
+			},
+			{
+				content: {
+					title: 'Custom Tags', text: 'You can also easily __add__ your own style with ``SimpleNotification.addTag()``.\nSee {{!https://github.com/Glagan/SimpleNotification#text-tag}} to know how.'
+				},
+				options: {}
+			},
+			{
+				content: {
+					title: 'Image and Separator', text: '![You can also have other images|https://oauth.net/images/code/javascript.png]\n---\nAnd you can separate content.'
+				},
+				options: {}
+			},
+			{
+				content: {
+					text: 'You have to choose an action to close this notification',
+					buttons: [{
+						value: 'Open', type: 'success', onClick: (notification) => {
+							SimpleNotification.success({
+								title: 'Another One !', text: 'You opened another notification without closing the old one.'
+							}, { position: 'top-left', insertAnimation: { name: 'scalein' } })
+						}
+					}, {
+						value: 'Close', type: 'error', onClick: (notification) => {
+							SimpleNotification.message({
+								title: 'Closing...', text: 'The other notification will close with a fadeout thanks to ``notification.closeAnimated()``.'
+							}, { position: 'bottom-right', insertAnimation: { name: 'rotatein' } });
+							notification.closeAnimated();
+						}
+					}]
+				},
+				options: { sticky: true, closeOnClick: false }
+			},
+			{
+				content: {
+					title: 'Click fast', text: 'You have to be fast to click the button on this one.',
+					buttons: [{
+						value: 'Click me', type: 'info', onClick: (notification) => {
+							SimpleNotification.success({
+								title: 'Nice', text: 'You did it **:)**'
+							}, { position: 'top-left' });
+							notification.close();
+						}
+					}]
+				},
+				options: {
+					duration: 1000,
+					events: {
+						onDeath: (notification) => {
+							notification.disableButtons();
+							notification.setType('info');
+							notification.buttons.childNodes[0].textContent = 'Disabled';
+							notification.setTitle('Gotta go faster');
+							notification.setText('Buttons can be **disabled** after the timer expired.\nYou can also choose to hide the notification, or change a lot of it\'s content.');
+						}
+					}
+				}
+			},
+			{
+				content: {
+					title: 'Modify after death', text: 'This notification will be updated after it\'s *death* with nice buttons.\nLet it die to see it.',
+				},
+				options: {
+					closeOnClick: false,
+					duration: 2000,
+					events: {
+						onDeath: (notification) => {
+							notification.events.onDeath = undefined;
+							notification.removeButtons();
+							notification.setType('message');
+							notification.addButton('error', 'Close', (notification) => {
+								notification.closeAnimated();
+							});
+							notification.setText('You can now click on the button to close this notification.');
+						}
+					}
+				}
+			},
+		];
+		let current = 0;
+		let max = notifications.length;
+		// Make buttons show notifications
+		document.querySelectorAll("[data-position]").forEach(button => {
+			button.addEventListener("click", event => {
+				notifications[current].options.position = event.target.dataset.position;
+				if (event.target.dataset.type == 'custom') {
+					SimpleNotification.custom(
+						["gn-custom"],
+						notifications[current].content,
+						notifications[current].options
+					);
+				} else {
+					SimpleNotification[event.target.dataset.type](
+						notifications[current].content,
+						notifications[current].options
+					);
+				}
+				current = (current + 1) % max;
+			});
+		})
+		// Notification Creator
+		document.getElementById("custom").addEventListener("submit", event => {
+			event.preventDefault();
+			let form = event.target;
+			let options = {
+				position: form.position.value,
+				duration: Math.floor(form.duration.value),
+				sticky: Math.floor(form.sticky.value),
+				closeOnClick: Math.floor(form.closeOnClick.value),
+				closeButton: Math.floor(form.closeButton.value),
+				insertAnimation: {
+					name: form.insertAnimationName.value,
+					duration: Math.floor(form.insertAnimationDuration.value)
+				},
+				removeAnimation: {
+					name: form.removeAnimationName.value,
+					duration: Math.floor(form.removeAnimationDuration.value)
+				}
+			};
+			SimpleNotification[form.type.value]({
+				title: form.title.value,
+				text: form.text.value,
+				image: form.image.value
+			}, options);
+		});
+	</script>
 </body>
+
 </html>
