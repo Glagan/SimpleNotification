@@ -436,7 +436,8 @@ class SimpleNotification {
 	/**
 	 * Add a single button after all already added buttons
 	 */
-	addButton(type, value, onClick) {
+	addButton(options) {
+		if (!options.type || !options.value) return;
 		if (this.buttons == undefined) {
 			this.buttons = document.createElement('div');
 			this.buttons.className = 'gn-buttons';
@@ -447,12 +448,12 @@ class SimpleNotification {
 			}
 		}
 		let button = document.createElement('button');
-		SimpleNotification.textToNode(value, button);
-		button.className = `gn-button gn-${type}`;
-		if (onClick) {
+		SimpleNotification.textToNode(options.value, button);
+		button.className = `gn-button gn-${options.type}`;
+		if (options.onClick) {
 			button.addEventListener('click', (event) => {
 				event.stopPropagation();
-				onClick(this);
+				options.onClick(this);
 			});
 		}
 		this.buttons.appendChild(button);
@@ -591,8 +592,6 @@ class SimpleNotification {
 		if (!hasImage && !hasTitle && !hasText && !hasButtons) return;
 		// Merge options
 		let options = SimpleNotification.deepAssign({}, SimpleNotification._options, notificationOptions);
-		// If there is nothing to close a notification we force the close button
-		options.closeButton = !options.closeOnClick && options.sticky ? true : options.closeButton;
 		// Create the notification
 		let notification = new SimpleNotification(options);
 		notification.make(classes);
@@ -614,7 +613,7 @@ class SimpleNotification {
 				content.buttons = [content.buttons];
 			}
 			for (let i = 0, max = content.buttons.length; i < max; i++) {
-				notification.addButton(content.buttons[i].type, content.buttons[i].value, content.buttons[i].onClick);
+				notification.addButton(content.buttons[i]);
 			}
 		}
 		// Add progress bar if not sticky
