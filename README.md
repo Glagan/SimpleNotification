@@ -121,6 +121,7 @@ Most of these tags can be nested to combine their effects.
 | Bold | ``**http://www.example.org/**`` |
 | Italic | ``*http://www.example.org/*`` |
 | Separator | ``\n---\n`` |
+| Float right | ``>*>Text<`` |
 
 Tags work by looking for an open token, an optional separator if there is a title, and the close token.  
 If the tag can have a *title* you need to use ``|`` as the separator with the *content*.

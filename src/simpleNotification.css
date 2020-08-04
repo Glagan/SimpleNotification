@@ -271,6 +271,7 @@
 .gn-content .gn-text {
 	padding: 0.5rem;
 	margin: 0;
+	width: 100%;
 }
 
 .gn-content .gn-text a {
@@ -353,4 +354,7 @@
 }
 .gn-button:last-child {
 	border-right: 0;
+}
+.gn-float-right {
+	float: right;
 }
