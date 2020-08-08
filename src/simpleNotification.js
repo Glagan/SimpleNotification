@@ -126,8 +126,9 @@ class SimpleNotification {
 		/** @type {HTMLElement | undefined} */
 		this.progressBar = undefined;
 		// Functions
-		// TODO: Missing typedef
+		/** @type {() => void} */
 		this.addExtinguish = this.addExtinguishFct.bind(this);
+		/** @type {() => void} */
 		this.removeExtinguish = this.removeExtinguishFct.bind(this);
 	}
 
