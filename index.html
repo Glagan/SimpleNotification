@@ -181,6 +181,15 @@
 												value="1" checked> Yes</label>
 									</div>
 								</div>
+								<div class="column">
+									<label class="label">Pause on Hover</label>
+									<div class="control">
+										<label class="radio"><input type="radio" name="pauseOnHover" name="pauseOnHover"
+												value="0"> No</label>
+										<label class="radio"><input type="radio" name="pauseOnHover" name="pauseOnHover"
+												value="1" checked> Yes</label>
+									</div>
+								</div>
 							</div>
 						</div>
 						<div class="field is-grouped">
@@ -425,6 +434,7 @@
 				position: form.position.value,
 				duration: Math.floor(form.duration.value),
 				sticky: Math.floor(form.sticky.value),
+				pauseOnHover: Math.floor(form.pauseOnHover.value),
 				closeOnClick: Math.floor(form.closeOnClick.value),
 				closeButton: Math.floor(form.closeButton.value),
 				insertAnimation: {

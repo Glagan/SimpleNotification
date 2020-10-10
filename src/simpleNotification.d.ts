@@ -24,6 +24,7 @@ interface Options {
 	position: NotificationPosition;
 	maxNotifications: number;
 	removeAllOnDisplay: boolean;
+	pauseOnHover: boolean;
 	closeOnClick: boolean;
 	closeButton: boolean;
 	duration: number;

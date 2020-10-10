@@ -57,6 +57,7 @@
  * @property {Position} position
  * @property {number} maxNotifications
  * @property {boolean} removeAllOnDisplay
+ * @property {boolean} pauseOnHover
  * @property {boolean} closeOnClick
  * @property {boolean} closeButton
  * @property {number} duration
@@ -418,7 +419,7 @@ class SimpleNotification {
 			} else if (event.animationName == this.options.insertAnimation.name) {
 				this.node.classList.remove('gn-insert');
 				// Reset notification duration when hovering
-				if (!this.options.sticky) {
+				if (!this.options.sticky && this.options.pauseOnHover) {
 					this.node.addEventListener('mouseenter', this.removeExtinguish);
 					this.node.addEventListener('mouseleave', this.addExtinguish);
 				}
@@ -437,7 +438,7 @@ class SimpleNotification {
 					}
 				}
 			} else if (event.animationName == 'shorten' && this.progressBar) {
-				if (!this.options.sticky) {
+				if (!this.options.sticky && this.options.pauseOnHover) {
 					this.node.removeEventListener('mouseenter', this.removeExtinguish);
 					this.node.removeEventListener('mouseleave', this.addExtinguish);
 				}
@@ -855,6 +856,7 @@ SimpleNotification._options = {
 	position: 'top-right',
 	maxNotifications: 0,
 	removeAllOnDisplay: false,
+	pauseOnHover: true,
 	closeOnClick: true,
 	closeButton: true,
 	duration: 4000,
