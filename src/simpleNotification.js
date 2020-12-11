@@ -887,6 +887,12 @@ SimpleNotification.tags = {
 		close: '``',
 		textContent: '$content',
 	},
+	floatRight: {
+		type: 'span',
+		class: 'gn-float-right',
+		open: '>*>',
+		close: '<',
+	},
 	header2: {
 		type: 'h2',
 		class: 'gn-header',
@@ -946,11 +952,5 @@ SimpleNotification.tags = {
 		textContent: false,
 		open: '\n',
 		close: '',
-	},
-	floatRight: {
-		type: 'span',
-		class: 'gn-float-right',
-		open: '>*>',
-		close: '<',
 	},
 };
