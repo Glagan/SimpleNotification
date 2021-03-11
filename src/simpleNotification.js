@@ -24,7 +24,7 @@
  * @typedef RemoveAnimationDefinition
  * @type {object}
  * @property {('fadeout' | 'scaleout' | 'rotateout')} name
- * @property {number} duration - in ms
+ * @property {number} duration in ms
  */
 
 /**
