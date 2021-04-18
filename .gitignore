@@ -1,2 +1,2 @@
-minify.bat
 .jshintrc
+node_modules

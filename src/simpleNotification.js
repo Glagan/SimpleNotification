@@ -95,7 +95,7 @@
  * @property {string} textContent
  */
 
-class SimpleNotification {
+export default class SimpleNotification {
 	/**
 	 * @param {Partial<Options>} [options]
 	 */
